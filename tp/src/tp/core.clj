@@ -547,10 +547,20 @@
 ; user=> (leer-entrada)
 ; 123
 ; "123"
-(defn leer-entrada[]
+(defn leer-entrada
   "Lee una cadena desde la terminal/consola. Si los parentesis no estan correctamente balanceados al presionar Enter/Intro,
    se considera que la cadena ingresada es una subcadena y el ingreso continua. De lo contrario, se la devuelve completa."
-  (read-line)
+  []
+)
+
+(defn sumar-caracteres
+  "Suma 1 al contador si el caracter es '(' y resta uno si el caracter es '("
+  [contador caracter]
+  (cond
+    (= caracter \() (+ contador 1)
+    (= caracter \)) (- contador 1)
+  :else
+    contador)
 )
 
 ; user=> (verificar-parentesis "(hola 'mundo")
@@ -563,8 +573,11 @@
 ; -1
 ; user=> (verificar-parentesis "(hola '(mundo) )")
 ; 0
-(defn verificar-parentesis[]
+(defn verificar-parentesis[cadena]
   "Cuenta los parentesis en una cadena, sumando 1 si `(`, restando 1 si `)`. Si el contador se hace negativo, para y retorna -1."
+  (reduce (fn [acumulador cadena] 
+          (if (= acumulador -1) (reduced -1) (sumar-caracteres acumulador cadena))) 
+          0 cadena)
 )
 
 ; user=> (actualizar-amb '(a 1 b 2 c 3) 'd 4)
