@@ -590,15 +590,32 @@
           0 cadena)
 )
 
+(defn obtener-indice
+  "Dado un ambiente y una clave obtiene el indice donde esta el valor asociado a la clave"
+  [ambiente clave i]
+  (cond 
+    (or (= (+ i 1) (count ambiente)) (empty? ambiente)) -1
+    (= clave (nth ambiente i)) (+ i 1)
+  :else
+  (recur ambiente clave (+ i 1)))
+)
+
+(defn reemplazar-aux [ambiente i valor]
+  "Dado un indice y un ambiente reemplaza el valor en el indice con el valor dado por parametro."
+  (let [resultado (take i ambiente)
+        resultado (concat resultado (list valor))
+        resultado (concat resultado (drop (+ 1 i) ambiente))]
+    resultado))
+
 (defn reemplazar
   "Busca una clave en un ambiente (una lista con claves en las posiciones impares [1, 3, 5...] y valores en las pares [2, 4, 6...]
    y reemplaza el valor asociado con el valor dado por parametro."
   [ambiente clave valor i]
+    (let [indice (obtener-indice ambiente clave i)]
     (cond 
-        (or (= (+ i 1) (count ambiente)) (empty? ambiente)) (apply list (conj ambiente clave valor))
-        (= clave (nth ambiente i)) (apply list (assoc ambiente (+ i 1) valor))
+        (= indice -1) (concat ambiente (list clave valor))
     :else
-      (recur ambiente clave valor (+ i 1)))
+      (reemplazar-aux ambiente indice valor)))
 )
 
 ; user=> (actualizar-amb '(a 1 b 2 c 3) 'd 4)
@@ -615,7 +632,7 @@
   [ambiente clave valor]
   (cond (error? valor) ambiente 
     :else
-      (reemplazar (vec ambiente) clave valor 0)
+      (reemplazar ambiente clave valor 0)
   )
 )
 
