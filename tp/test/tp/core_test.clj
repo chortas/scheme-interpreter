@@ -22,3 +22,11 @@
     (is (= "(;ERROR: unbound variable: f)" (str (buscar 'f '(a 1 b 2 c 3 d 4 e 5)))))
   )
 )
+
+(deftest error?-test
+  (testing "Funcion error?"
+    (is (= true (error? (list (symbol ";ERROR:") 'mal 'hecho)))) 
+    (is (= false (error? (list 'mal 'hecho)))) 
+    (is (= true (error? (list (symbol ";WARNING:") 'mal 'hecho)))) 
+  )
+)

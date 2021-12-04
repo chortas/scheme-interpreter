@@ -623,8 +623,12 @@
 ; false
 ; user=> (error? (list (symbol ";WARNING:") 'mal 'hecho))
 ; true
-(defn error?[]
+(defn error?
   "Devuelve true o false, segun sea o no el arg. una lista con `;ERROR:` o `;WARNING:` como primer elemento."
+  [error]
+  (let [elemento (peek error)]
+    (or (= elemento (symbol ";ERROR:")) (= elemento (symbol ";WARNING:")))  
+  )
 )
 
 ; user=> (proteger-bool-en-str "(or #F #f #t #T)")
