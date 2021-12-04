@@ -30,3 +30,12 @@
     (is (= true (error? (list (symbol ";WARNING:") 'mal 'hecho)))) 
   )
 )
+
+(deftest actualizar-amb-test
+  (testing "Funcion actualizar-amb"
+    (is (= '(a 1 b 2 c 3 d 4) (actualizar-amb '(a 1 b 2 c 3) 'd 4)))
+    (is (= '(a 1 b 4 c 3) (actualizar-amb '(a 1 b 2 c 3) 'b 4)))
+    (is (= '(a 1 b 2 c 3) (actualizar-amb '(a 1 b 2 c 3) 'b (list (symbol ";ERROR:") 'mal 'hecho)))) 
+    (is (= '(b 7) (actualizar-amb () 'b 7)))
+  )
+)

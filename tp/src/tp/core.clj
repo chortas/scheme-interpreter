@@ -590,6 +590,17 @@
           0 cadena)
 )
 
+(defn reemplazar
+  "Busca una clave en un ambiente (una lista con claves en las posiciones impares [1, 3, 5...] y valores en las pares [2, 4, 6...]
+   y reemplaza el valor asociado con el valor dado por parametro."
+  [ambiente clave valor i]
+    (cond 
+        (or (= (+ i 1) (count ambiente)) (empty? ambiente)) (apply list (conj ambiente clave valor))
+        (= clave (nth ambiente i)) (apply list (assoc ambiente (+ i 1) valor))
+    :else
+      (recur ambiente clave valor (+ i 1)))
+)
+
 ; user=> (actualizar-amb '(a 1 b 2 c 3) 'd 4)
 ; (a 1 b 2 c 3 d 4)
 ; user=> (actualizar-amb '(a 1 b 2 c 3) 'b 4)
@@ -598,9 +609,14 @@
 ; (a 1 b 2 c 3)
 ; user=> (actualizar-amb () 'b 7)
 ; (b 7)
-(defn actualizar-amb[]
+(defn actualizar-amb
   "Devuelve un ambiente actualizado con una clave (nombre de la variable o funcion) y su valor. 
   Si el valor es un error, el ambiente no se modifica. De lo contrario, se le carga o reemplaza la nueva informacion."
+  [ambiente clave valor]
+  (cond (error? valor) ambiente 
+    :else
+      (reemplazar (vec ambiente) clave valor 0)
+  )
 )
 
 ; user=> (buscar 'c '(a 1 b 2 c 3 d 4 e 5))
@@ -626,9 +642,7 @@
 (defn error?
   "Devuelve true o false, segun sea o no el arg. una lista con `;ERROR:` o `;WARNING:` como primer elemento."
   [error]
-  (let [elemento (peek error)]
-    (or (= elemento (symbol ";ERROR:")) (= elemento (symbol ";WARNING:")))  
-  )
+  (and (list? error) (or (= (first error) (symbol ";ERROR:")) (= (first error) (symbol ";WARNING:"))))  
 )
 
 ; user=> (proteger-bool-en-str "(or #F #f #t #T)")
