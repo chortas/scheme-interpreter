@@ -538,6 +538,14 @@
 
 
 ; FUNCIONES QUE DEBEN SER IMPLEMENTADAS PARA COMPLETAR EL INTERPRETE DE SCHEME (ADEMAS DE COMPLETAR `EVALUAR` Y `APLICAR-FUNCION-PRIMITIVA`):
+(defn leer-entrada-aux[acum]
+  "Lee una cadena desde la terminal/consola. Si los parentesis no estan correctamente balanceados al presionar Enter/Intro,
+   se considera que la cadena ingresada es una subcadena y el ingreso continua. De lo contrario, se la devuelve completa."
+  (let [entrada (st/trim (read-line)) cadena (str acum entrada)]
+        (cond (= 0 (verificar-parentesis cadena)) cadena
+        :else
+          (recur (str cadena " "))))
+)
 
 ; LEER-ENTRADA:
 ; user=> (leer-entrada)
@@ -547,10 +555,10 @@
 ; user=> (leer-entrada)
 ; 123
 ; "123"
-(defn leer-entrada
+(defn leer-entrada[]
   "Lee una cadena desde la terminal/consola. Si los parentesis no estan correctamente balanceados al presionar Enter/Intro,
    se considera que la cadena ingresada es una subcadena y el ingreso continua. De lo contrario, se la devuelve completa."
-  []
+  (leer-entrada-aux "")
 )
 
 (defn sumar-caracteres
