@@ -555,9 +555,10 @@
 ; user=> (leer-entrada)
 ; 123
 ; "123"
-(defn leer-entrada[]
+(defn leer-entrada
   "Lee una cadena desde la terminal/consola. Si los parentesis no estan correctamente balanceados al presionar Enter/Intro,
    se considera que la cadena ingresada es una subcadena y el ingreso continua. De lo contrario, se la devuelve completa."
+  []
   (leer-entrada-aux "")
 )
 
@@ -581,8 +582,9 @@
 ; -1
 ; user=> (verificar-parentesis "(hola '(mundo) )")
 ; 0
-(defn verificar-parentesis[cadena]
+(defn verificar-parentesis
   "Cuenta los parentesis en una cadena, sumando 1 si `(`, restando 1 si `)`. Si el contador se hace negativo, para y retorna -1."
+  [cadena]
   (reduce (fn [acumulador cadena] 
           (if (= acumulador -1) (reduced -1) (sumar-caracteres acumulador cadena))) 
           0 cadena)
@@ -605,13 +607,18 @@
 ; 3
 ; user=> (buscar 'f '(a 1 b 2 c 3 d 4 e 5))
 ; (;ERROR: unbound variable: f)
-(defn buscar[]
+(defn buscar
   "Busca una clave en un ambiente (una lista con claves en las posiciones impares [1, 3, 5...] y valores en las pares [2, 4, 6...]
    y devuelve el valor asociado. Devuelve un error :unbound-variable si no la encuentra."
+  [clave ambiente]
+    (cond (= clave (nth ambiente 0)) (nth ambiente 1)
+        (= 1 (count ambiente)) (generar-mensaje-error :unbound-variable 'f)
+    :else
+      (recur clave (pop ambiente)))
 )
 
 ; user=> (error? (list (symbol ";ERROR:") 'mal 'hecho))
-; true
+; true  
 ; user=> (error? (list 'mal 'hecho))
 ; false
 ; user=> (error? (list (symbol ";WARNING:") 'mal 'hecho))
