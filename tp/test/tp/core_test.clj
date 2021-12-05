@@ -86,3 +86,11 @@
     (is (= "#f" (fnc-equal? '(1 1 2 1))))
   )
 )
+
+(deftest fnc-read-test
+  (testing "Funcion fnc-read"
+    (is (= "(;ERROR: read: Use of I/O ports not implemented)" (str (fnc-read '(1)))))
+    (is (= "(;ERROR: Wrong number of args given #<primitive-procedure read>)" (str (fnc-read '(1 2)))))
+    (is (= "(;ERROR: Wrong number of args given #<primitive-procedure read>)" (str (fnc-read '(1 2 3)))))
+  )
+)
