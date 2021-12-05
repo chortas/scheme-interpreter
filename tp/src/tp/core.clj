@@ -668,8 +668,10 @@
 ; "(and (or %F %f %t %T) %T)"
 ; user=> (proteger-bool-en-str "")
 ; ""
-(defn proteger-bool-en-str[]
+(defn proteger-bool-en-str
   "Cambia, en una cadena, #t por %t y #f por %f (y sus respectivas versiones en mayusculas), para poder aplicarle read-string."
+  [cadena]
+  (st/replace cadena #"#t|#f|#T|#F" {"#t" "%t" "#f" "%f" "#T" "%T" "#F" "%F"})
 )
 
 ; user=> (restaurar-bool (read-string (proteger-bool-en-str "(and (or #F #f #t #T) #T)")))

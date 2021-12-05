@@ -39,3 +39,11 @@
     (is (= '(b 7) (actualizar-amb () 'b 7)))
   )
 )
+
+(deftest proteger-bool-en-str-test
+  (testing "Funcion proteger-bool-en-str"
+    (is (= "(or %F %f %t %T)" (proteger-bool-en-str "(or #F #f #t #T)")))
+    (is (= "(and (or %F %f %t %T) %T)" (proteger-bool-en-str "(and (or #F #f #t #T) #T)")))
+    (is (= "" (proteger-bool-en-str "")))
+  )
+)
