@@ -47,3 +47,10 @@
     (is (= "" (proteger-bool-en-str "")))
   )
 )
+
+(deftest proteger-bool-en-str-test
+  (testing "Funcion proteger-bool-en-str"
+    (is (= (symbol "(and (or #F #f #t #T) #T)") (restaurar-bool (read-string (proteger-bool-en-str "(and (or #F #f #t #T) #T)")))))
+    (is (= (symbol "(and (or #F #f #t #T) #T)") (restaurar-bool (read-string "(and (or %F %f %t %T) %T)") )))
+  )
+)
