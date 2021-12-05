@@ -54,3 +54,11 @@
     (is (= (symbol "(and (or #F #f #t #T) #T)") (restaurar-bool (read-string "(and (or %F %f %t %T) %T)") )))
   )
 )
+
+(deftest fnc-append-test
+  (testing "Funcion fnc-append"
+    (is (= '(1 2 3 4 5 6 7) (fnc-append '( (1 2) (3) (4 5) (6 7)))))
+    (is (= "(;ERROR: append: Wrong type in arg 3)" (str (fnc-append '( (1 2) 3 (4 5) (6 7))))))
+    (is (= "(;ERROR: append: Wrong type in arg A)" (str (fnc-append '( (1 2) A (4 5) (6 7))))))
+  )
+)

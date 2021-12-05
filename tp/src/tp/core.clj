@@ -704,14 +704,23 @@
   "Verifica la igualdad entre dos elementos al estilo de Scheme (case-insensitive)"
 )
 
+(defn fnc-append-aux[lista resultado i]
+  (cond (= i (count lista)) resultado
+        (not (list? (nth lista i))) (generar-mensaje-error :wrong-type-arg "append" (nth lista i))
+        :else
+          (recur lista (concat resultado (nth lista i)) (+ i 1)))
+)
+
 ; user=> (fnc-append '( (1 2) (3) (4 5) (6 7)))
 ; (1 2 3 4 5 6 7)
 ; user=> (fnc-append '( (1 2) 3 (4 5) (6 7)))
 ; (;ERROR: append: Wrong type in arg 3)
 ; user=> (fnc-append '( (1 2) A (4 5) (6 7)))
 ; (;ERROR: append: Wrong type in arg A)
-(defn fnc-append[]
+(defn fnc-append
   "Devuelve el resultado de fusionar listas."
+  [lista]
+  (fnc-append-aux lista (empty list) 0)
 )
 
 ; user=> (fnc-equal? ())
