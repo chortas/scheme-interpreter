@@ -803,6 +803,15 @@
   (nth (reduce fnc-sumar-aux [0 0] elementos) 0)
 )
 
+(defn fnc-restar-aux
+  [[acumulador i] elemento]
+  (cond
+    (not (number? acumulador)) (reduced [(generar-mensaje-error :wrong-type-arg1 "-" acumulador) i])
+    (not (number? elemento)) (reduced [(generar-mensaje-error :wrong-type-arg2 "-" elemento) i])
+    :else
+    [(- acumulador elemento) (+ i 1)])
+)
+
 ; user=> (fnc-restar ())
 ; (;ERROR: -: Wrong number of args given)
 ; user=> (fnc-restar '(3))
@@ -819,8 +828,13 @@
 ; (;ERROR: -: Wrong type in arg2 A)
 ; user=> (fnc-restar '(3 4 A 6))
 ; (;ERROR: -: Wrong type in arg2 A)
-(defn fnc-restar[]
+(defn fnc-restar
   "Resta los elementos de un lista."
+  [elementos]
+  (cond (= 0 (count elementos)) (generar-mensaje-error :wrong-number-args-oper "-")
+        (= 1 (count elementos)) (- (first elementos))
+  :else
+    (nth (reduce fnc-restar-aux [(first elementos) 0] (pop elementos)) 0))
 )
 
 ; user=> (fnc-menor ())
