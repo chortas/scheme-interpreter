@@ -48,10 +48,10 @@
   )
 )
 
-(deftest proteger-bool-en-str-test
-  (testing "Funcion proteger-bool-en-str"
+(deftest restaurar-bool-test
+  (testing "Funcion restaurar-bool"
     (is (= (symbol "(and (or #F #f #t #T) #T)") (restaurar-bool (read-string (proteger-bool-en-str "(and (or #F #f #t #T) #T)")))))
-    (is (= (symbol "(and (or #F #f #t #T) #T)") (restaurar-bool (read-string "(and (or %F %f %t %T) %T)") )))
+    (is (= (symbol "(and (or #F #f #t #T) #T)") (restaurar-bool (read-string "(and (or %F %f %t %T) %T)"))))
   )
 )
 
@@ -70,5 +70,19 @@
     (is (= '(1 2 3 4 5 6 7) (fnc-append '( (1 2) (3) (4 5) (6 7)))))
     (is (= "(;ERROR: append: Wrong type in arg 3)" (str (fnc-append '( (1 2) 3 (4 5) (6 7))))))
     (is (= "(;ERROR: append: Wrong type in arg A)" (str (fnc-append '( (1 2) A (4 5) (6 7))))))
+  )
+)
+
+(deftest fnc-equal-test
+  (testing "Funcion fnc-equal"
+    (is (= "#t" (fnc-equal? ())))
+    (is (= "#t" (fnc-equal? '(A))))
+    (is (= "#t" (fnc-equal? '(A a))))
+    (is (= "#t" (fnc-equal? '(A a))))
+    (is (= "#t" (fnc-equal? '(A a A))))
+    (is (= "#t" (fnc-equal? '(A a A a))))
+    (is (= "#f" (fnc-equal? '(A a A B))))
+    (is (= "#t" (fnc-equal? '(1 1 1 1))))
+    (is (= "#f" (fnc-equal? '(1 1 2 1))))
   )
 )

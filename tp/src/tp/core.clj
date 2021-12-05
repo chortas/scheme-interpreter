@@ -585,8 +585,8 @@
 (defn verificar-parentesis
   "Cuenta los parentesis en una cadena, sumando 1 si `(`, restando 1 si `)`. Si el contador se hace negativo, para y retorna -1."
   [cadena]
-  (reduce (fn [acumulador cadena] 
-          (if (= acumulador -1) (reduced -1) (sumar-caracteres acumulador cadena))) 
+  (reduce (fn [acumulador c] 
+          (if (= acumulador -1) (reduced -1) (sumar-caracteres acumulador c))) 
           0 cadena)
 )
 
@@ -741,8 +741,18 @@
 ; #t
 ; user=> (fnc-equal? '(1 1 2 1))
 ; #f
-(defn fnc-equal?[]
+(defn fnc-equal?
   "Compara elementos. Si son iguales, devuelve #t. Si no, #f."
+  [elementos]
+  (if
+    (cond (empty? elementos) true
+    :else
+      (reduce (fn [elementos-aux elemento] 
+               (let [elementos-aux (pop elementos-aux)]
+               (cond (empty? elementos-aux) (reduced true)
+               (not (igual? (first elementos-aux) elemento)) (reduced false)
+               :else elementos-aux))) elementos elementos))
+    "#t" "#f")
 )
 
 ; user=> (fnc-read ())
