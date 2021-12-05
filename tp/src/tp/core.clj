@@ -747,11 +747,10 @@
   (if
     (cond (empty? elementos) true
     :else
-      (reduce (fn [elementos-aux elemento] 
-               (let [elementos-aux (pop elementos-aux)]
-               (cond (empty? elementos-aux) (reduced true)
-               (not (igual? (first elementos-aux) elemento)) (reduced false)
-               :else elementos-aux))) elementos elementos))
+      (reduce (fn [igual [elemento1 elemento2]] 
+               (let [igual-aux (igual? elemento1 elemento2)]
+               (cond (not igual-aux) (reduced false)
+               :else (and igual igual-aux)))) true (partition 2 1 elementos)))
     "#t" "#f")
 )
 
@@ -773,6 +772,15 @@
   :else (generar-mensaje-error :wrong-number-args-prim-proc "read"))
 )
 
+(defn fnc-sumar-aux
+  [[acumulador i] elemento]
+  (cond
+    (and (not (number? elemento)) (= 0 i)) (reduced [(generar-mensaje-error :wrong-type-arg1 "+" elemento) i])
+    (not (number? elemento)) (reduced [(generar-mensaje-error :wrong-type-arg2 "+" elemento) i])
+    :else
+    [(+ acumulador elemento) (+ i 1)])
+)
+
 ; user=> (fnc-sumar ())
 ; 0
 ; user=> (fnc-sumar '(3))
@@ -789,8 +797,10 @@
 ; (;ERROR: +: Wrong type in arg2 A)
 ; user=> (fnc-sumar '(3 4 A 6))
 ; (;ERROR: +: Wrong type in arg2 A)
-(defn fnc-sumar[]
+(defn fnc-sumar
   "Suma los elementos de una lista."
+  [elementos]
+  (nth (reduce fnc-sumar-aux [0 0] elementos) 0)
 )
 
 ; user=> (fnc-restar ())

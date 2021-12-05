@@ -94,3 +94,16 @@
     (is (= "(;ERROR: Wrong number of args given #<primitive-procedure read>)" (str (fnc-read '(1 2 3)))))
   )
 )
+
+(deftest fnc-sumar-test
+  (testing "Funcion fnc-sumar"
+    (is (= 0 (fnc-sumar ())))
+    (is (= 3 (fnc-sumar '(3))))
+    (is (= 7 (fnc-sumar '(3 4))))
+    (is (= 12 (fnc-sumar '(3 4 5))))
+    (is (= 18 (fnc-sumar '(3 4 5 6))))
+    (is (= "(;ERROR: +: Wrong type in arg1 A)" (str (fnc-sumar '(A 4 5 6)))))
+    (is (= "(;ERROR: +: Wrong type in arg2 A)" (str (fnc-sumar '(3 A 5 6)))))
+    (is (= "(;ERROR: +: Wrong type in arg2 A)" (str (fnc-sumar '(3 4 A 6)))))
+  )
+)
