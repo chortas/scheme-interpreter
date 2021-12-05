@@ -55,6 +55,16 @@
   )
 )
 
+(deftest igual?-test
+  (testing "Funcion igual?"
+    (is (= true (igual? 'if 'IF))) 
+    (is (= true (igual? 'if 'if))) 
+    (is (= true (igual? 'IF 'IF))) 
+    (is (= false (igual? 'IF "IF"))) 
+    (is (= false (igual? 6 "6"))) 
+  )
+)
+
 (deftest fnc-append-test
   (testing "Funcion fnc-append"
     (is (= '(1 2 3 4 5 6 7) (fnc-append '( (1 2) (3) (4 5) (6 7)))))

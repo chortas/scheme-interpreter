@@ -700,8 +700,10 @@
 ; false
 ; user=> (igual? 6 "6")
 ; false
-(defn igual?[]
+(defn igual?
   "Verifica la igualdad entre dos elementos al estilo de Scheme (case-insensitive)"
+  [elemento1 elemento2]
+  (and (= (type elemento1) (type elemento2)) (= (st/lower-case (str elemento1)) (st/lower-case  (str elemento2))))
 )
 
 (defn fnc-append-aux[lista resultado i]
