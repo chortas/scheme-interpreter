@@ -725,6 +725,13 @@
   (fnc-append-aux lista (empty list) 0)
 )
 
+(defn bool-a-symbol
+  [booleano]  
+  (cond (not (boolean? booleano)) booleano
+        booleano (symbol "#t")
+  :else (symbol "#f"))
+)
+
 ; user=> (fnc-equal? ())
 ; #t
 ; user=> (fnc-equal? '(A))
@@ -744,14 +751,13 @@
 (defn fnc-equal?
   "Compara elementos. Si son iguales, devuelve #t. Si no, #f."
   [elementos]
-  (if
+  (bool-a-symbol
     (cond (empty? elementos) true
     :else
       (reduce (fn [igual [elemento1 elemento2]] 
                (let [igual-aux (igual? elemento1 elemento2)]
                (cond (not igual-aux) (reduced false)
-               :else (and igual igual-aux)))) true (partition 2 1 elementos)))
-    "#t" "#f")
+               :else (and igual igual-aux)))) true (partition 2 1 elementos))))
 )
 
 ; user=> (fnc-read ())
@@ -837,6 +843,14 @@
     (nth (reduce fnc-restar-aux [(first elementos) 0] (pop elementos)) 0))
 )
 
+(defn fnc-menor-aux 
+  [menor [elemento1 elemento2]] 
+  (cond (not (number? elemento1)) (reduced (generar-mensaje-error :wrong-type-arg1 "<" elemento1)) 
+        (not (number? elemento2)) (reduced (generar-mensaje-error :wrong-type-arg2 "<" elemento2)) 
+        (not (< elemento1 elemento2)) (reduced false)
+  :else (and menor (< elemento1 elemento2)))
+)
+
 ; user=> (fnc-menor ())
 ; #t
 ; user=> (fnc-menor '(1))
@@ -857,8 +871,13 @@
 ; (;ERROR: <: Wrong type in arg2 A)
 ; user=> (fnc-menor '(1 2 A 4))
 ; (;ERROR: <: Wrong type in arg2 A)
-(defn fnc-menor[]
+(defn fnc-menor
   "Devuelve #t si los numeros de una lista estan en orden estrictamente creciente; si no, #f."
+  [elementos]
+  (bool-a-symbol
+    (cond (empty? elementos) true
+    :else
+      (reduce fnc-menor-aux true (partition 2 1 elementos))))
 )
 
 ; user=> (fnc-mayor ())

@@ -75,15 +75,15 @@
 
 (deftest fnc-equal-test
   (testing "Funcion fnc-equal"
-    (is (= "#t" (fnc-equal? ())))
-    (is (= "#t" (fnc-equal? '(A))))
-    (is (= "#t" (fnc-equal? '(A a))))
-    (is (= "#t" (fnc-equal? '(A a))))
-    (is (= "#t" (fnc-equal? '(A a A))))
-    (is (= "#t" (fnc-equal? '(A a A a))))
-    (is (= "#f" (fnc-equal? '(A a A B))))
-    (is (= "#t" (fnc-equal? '(1 1 1 1))))
-    (is (= "#f" (fnc-equal? '(1 1 2 1))))
+    (is (= (symbol "#t") (fnc-equal? ())))
+    (is (= (symbol "#t") (fnc-equal? '(A))))
+    (is (= (symbol "#t") (fnc-equal? '(A a))))
+    (is (= (symbol "#t") (fnc-equal? '(A a))))
+    (is (= (symbol "#t") (fnc-equal? '(A a A))))
+    (is (= (symbol "#t") (fnc-equal? '(A a A a))))
+    (is (= (symbol "#f") (fnc-equal? '(A a A B))))
+    (is (= (symbol "#t") (fnc-equal? '(1 1 1 1))))
+    (is (= (symbol "#f") (fnc-equal? '(1 1 2 1))))
   )
 )
 
@@ -118,5 +118,21 @@
     (is (= "(;ERROR: -: Wrong type in arg1 A)" (str (fnc-restar '(A 4 5 6)))))
     (is (= "(;ERROR: -: Wrong type in arg2 A)" (str (fnc-restar '(3 A 5 6)))))
     (is (= "(;ERROR: -: Wrong type in arg2 A)" (str (fnc-restar '(3 4 A 6)))))
+  )
+)
+
+
+(deftest fnc-menor-test
+  (testing "Funcion fnc-menor"
+    (is (= (symbol "#t") (fnc-menor ())))
+    (is (= (symbol "#t") (fnc-menor '(1))))
+    (is (= (symbol "#t") (fnc-menor '(1 2))))
+    (is (= (symbol "#t") (fnc-menor '(1 2 3))))
+    (is (= (symbol "#t") (fnc-menor '(1 2 3 4))))
+    (is (= (symbol "#f") (fnc-menor '(1 2 2 4))))
+    (is (= (symbol "#f") (fnc-menor '(1 2 1 4))))
+    (is (= "(;ERROR: <: Wrong type in arg1 A)" (str (fnc-menor '(A 1 2 4)))))
+    (is (= "(;ERROR: <: Wrong type in arg2 A)" (str (fnc-menor '(1 A 1 4)))))
+    (is (= "(;ERROR: <: Wrong type in arg2 A)" (str (fnc-menor '(1 2 A 4)))))
   )
 )
