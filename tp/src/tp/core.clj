@@ -645,7 +645,7 @@
    y devuelve el valor asociado. Devuelve un error :unbound-variable si no la encuentra."
   [clave ambiente]
     (cond (= clave (nth ambiente 0)) (nth ambiente 1)
-        (= 1 (count ambiente)) (generar-mensaje-error :unbound-variable 'f)
+        (= 1 (count ambiente)) (generar-mensaje-error :unbound-variable clave)
     :else
       (recur clave (pop ambiente)))
 )
@@ -944,8 +944,13 @@
 ; ("hola" (x 6 y 11 z "hola"))
 ; user=> (evaluar-escalar 'n '(x 6 y 11 z "hola"))
 ; ((;ERROR: unbound variable: n) (x 6 y 11 z "hola"))
-(defn evaluar-escalar[]
+(defn evaluar-escalar
   "Evalua una expresion escalar. Devuelve una lista con el resultado y un ambiente."
+  [elemento ambiente]
+    (cond (symbol? elemento) (list (buscar elemento ambiente) ambiente)
+    :else
+      (list elemento ambiente)
+  )
 )
 
 ; user=> (evaluar-define '(define x 2) '(x 1))
