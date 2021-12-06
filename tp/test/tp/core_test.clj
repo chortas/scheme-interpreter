@@ -121,7 +121,6 @@
   )
 )
 
-
 (deftest fnc-menor-test
   (testing "Funcion fnc-menor"
     (is (= (symbol "#t") (fnc-menor ())))
@@ -134,5 +133,35 @@
     (is (= "(;ERROR: <: Wrong type in arg1 A)" (str (fnc-menor '(A 1 2 4)))))
     (is (= "(;ERROR: <: Wrong type in arg2 A)" (str (fnc-menor '(1 A 1 4)))))
     (is (= "(;ERROR: <: Wrong type in arg2 A)" (str (fnc-menor '(1 2 A 4)))))
+  )
+)
+
+(deftest fnc-mayor-test
+  (testing "Funcion fnc-mayor"
+    (is (= (symbol "#t") (fnc-mayor ())))
+    (is (= (symbol "#t") (fnc-mayor '(1))))
+    (is (= (symbol "#t") (fnc-mayor '(2 1))))
+    (is (= (symbol "#t") (fnc-mayor '(3 2 1))))
+    (is (= (symbol "#t") (fnc-mayor '(4 3 2 1))))
+    (is (= (symbol "#f") (fnc-mayor '(4 2 2 1))))
+    (is (= (symbol "#f") (fnc-mayor '(4 2 1 4))))
+    (is (= "(;ERROR: >: Wrong type in arg1 A)" (str (fnc-mayor '(A 3 2 1)))))
+    (is (= "(;ERROR: >: Wrong type in arg2 A)" (str (fnc-mayor '(3 A 2 1)))))
+    (is (= "(;ERROR: >: Wrong type in arg2 A)" (str (fnc-mayor '(3 2 A 1)))))
+  )
+)
+
+(deftest fnc-mayor-o-igual-test
+  (testing "Funcion fnc-mayor-o-igual"
+    (is (= (symbol "#t") (fnc-mayor-o-igual ())))
+    (is (= (symbol "#t") (fnc-mayor-o-igual '(1))))
+    (is (= (symbol "#t") (fnc-mayor-o-igual '(2 1))))
+    (is (= (symbol "#t") (fnc-mayor-o-igual '(3 2 1))))
+    (is (= (symbol "#t") (fnc-mayor-o-igual '(4 3 2 1))))
+    (is (= (symbol "#t") (fnc-mayor-o-igual '(4 2 2 1))))
+    (is (= (symbol "#f") (fnc-mayor-o-igual '(4 2 1 4))))
+    (is (= "(;ERROR: >=: Wrong type in arg1 A)" (str (fnc-mayor-o-igual '(A 3 2 1)))))
+    (is (= "(;ERROR: >=: Wrong type in arg2 A)" (str (fnc-mayor-o-igual '(3 A 2 1)))))
+    (is (= "(;ERROR: >=: Wrong type in arg2 A)" (str (fnc-mayor-o-igual '(3 2 A 1)))))
   )
 )

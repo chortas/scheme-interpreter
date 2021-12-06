@@ -843,12 +843,17 @@
     (nth (reduce fnc-restar-aux [(first elementos) 0] (pop elementos)) 0))
 )
 
-(defn fnc-menor-aux 
-  [menor [elemento1 elemento2]] 
-  (cond (not (number? elemento1)) (reduced (generar-mensaje-error :wrong-type-arg1 "<" elemento1)) 
-        (not (number? elemento2)) (reduced (generar-mensaje-error :wrong-type-arg2 "<" elemento2)) 
-        (not (< elemento1 elemento2)) (reduced false)
-  :else (and menor (< elemento1 elemento2)))
+(defn fnc-cmp-aux 
+  [elementos cmp cmp-rep]
+  (bool-a-symbol
+    (cond (empty? elementos) true
+    :else
+      (reduce (fn [menor [elemento1 elemento2]]
+          (cond (not (number? elemento1)) (reduced (generar-mensaje-error :wrong-type-arg1 cmp-rep elemento1)) 
+                (not (number? elemento2)) (reduced (generar-mensaje-error :wrong-type-arg2 cmp-rep elemento2)) 
+                (not (cmp elemento1 elemento2)) (reduced false)
+          :else (and (cmp elemento1 elemento2)))) 
+          true (partition 2 1 elementos))))
 )
 
 ; user=> (fnc-menor ())
@@ -874,10 +879,7 @@
 (defn fnc-menor
   "Devuelve #t si los numeros de una lista estan en orden estrictamente creciente; si no, #f."
   [elementos]
-  (bool-a-symbol
-    (cond (empty? elementos) true
-    :else
-      (reduce fnc-menor-aux true (partition 2 1 elementos))))
+  (fnc-cmp-aux elementos < "<")
 )
 
 ; user=> (fnc-mayor ())
@@ -900,8 +902,10 @@
 ; (;ERROR: >: Wrong type in arg2 A)
 ; user=> (fnc-mayor '(3 2 A 1))
 ; (;ERROR: >: Wrong type in arg2 A)
-(defn fnc-mayor[]
+(defn fnc-mayor
   "Devuelve #t si los numeros de una lista estan en orden estrictamente decreciente; si no, #f."
+  [elementos]
+  (fnc-cmp-aux elementos > ">")
 )
 
 ; user=> (fnc-mayor-o-igual ())
@@ -924,8 +928,10 @@
 ; (;ERROR: >=: Wrong type in arg2 A)
 ; user=> (fnc-mayor-o-igual '(3 2 A 1))
 ; (;ERROR: >=: Wrong type in arg2 A)
-(defn fnc-mayor-o-igual[]
+(defn fnc-mayor-o-igual
   "Devuelve #t si los numeros de una lista estan en orden decreciente; si no, #f."
+  [elementos]
+  (fnc-cmp-aux elementos >= ">=")
 )
 
 ; user=> (evaluar-escalar 32 '(x 6 y 11 z "hola"))
