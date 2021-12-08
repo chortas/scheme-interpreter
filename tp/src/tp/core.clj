@@ -973,14 +973,14 @@
   "Evalua una expresion `define`. Devuelve una lista con el resultado y un ambiente actualizado con la definicion."
   [definicion ambiente]
   (let [unspecified (symbol "#<unspecified>")] 
-  (cond (= 1 (count definicion)) (generar-mensaje-error :missing-or-extra (first definicion) (list definicion ambiente))  
-        (and (symbol? (nth definicion 1)) (= 3 (count definicion))) (list unspecified (actualizar-amb ambiente (nth definicion 1) (nth definicion 2)))     
-        (and (symbol? (nth definicion 1)) (not (= 3 (count definicion)))) (generar-mensaje-error :missing-or-extra (first definicion) (list definicion ambiente))       
-        (and (list? (nth definicion 1)) (not (= 3 (count definicion)))) (generar-mensaje-error :missing-or-extra (first definicion) (list definicion ambiente))       
-        (and (list? (nth definicion 1)) (not (list? (nth definicion 2)))) (generar-mensaje-error :bad-variable (first definicion) (list definicion ambiente))       
-        (and (list? (nth definicion 1)) (= 3 (count definicion))) (list unspecified (concat ambiente (list (nth (nth definicion 1) 0) (list 'lambda (list (nth (nth definicion 1) 1)) (nth definicion 2)))))
-        (and (not (symbol? (nth definicion 1))) (not (list? (nth definicion 1)))) (generar-mensaje-error :bad-variable (first definicion) (list definicion ambiente))       
-  ))
+  (cond (not (= 3 (count definicion))) (list (generar-mensaje-error :missing-or-extra (first definicion) definicion) ambiente)   
+        :else
+        (cond
+          (and (list? (nth definicion 1)) (not (list? (nth definicion 2)))) (list (generar-mensaje-error :bad-variable (first definicion) definicion) ambiente)       
+          (and (not (symbol? (nth definicion 1))) (not (list? (nth definicion 1)))) (list (generar-mensaje-error :bad-variable (first definicion) definicion) ambiente)    
+          (symbol? (nth definicion 1)) (list unspecified (actualizar-amb ambiente (nth definicion 1) (nth definicion 2)))
+          (list? (nth definicion 1)) (list unspecified (concat ambiente (list (nth (nth definicion 1) 0) (list 'lambda (list (nth (nth definicion 1) 1)) (nth definicion 2)))))        
+        )))
 )
 
 ; user=> (evaluar-if '(if 1 2) '(n 7))
