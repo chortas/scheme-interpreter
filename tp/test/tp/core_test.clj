@@ -182,6 +182,7 @@
   (testing "Funcion evaluar-define"
     (is (= (list (symbol "#<unspecified>") '(x 2)) (evaluar-define '(define x 2) '(x 1))))
     (is (= (list (symbol "#<unspecified>") '(x 1 f (lambda (x) (+ x 1)))) (evaluar-define '(define (f x) (+ x 1)) '(x 1))))  
+    (is (= (list (symbol "#<unspecified>") '(x 1 f (lambda (x) (display x) (newline) (+ x 1)))) (evaluar-define '(define (f x) (display x) (newline) (+ x 1)) '(x 1))))  
     (is (= "((;ERROR: define: missing or extra expression (define)) (x 1))" (str (evaluar-define '(define) '(x 1)))))
     (is (= "((;ERROR: define: missing or extra expression (define x)) (x 1))" (str (evaluar-define '(define x) '(x 1)))))
     (is (= "((;ERROR: define: missing or extra expression (define x 2 3)) (x 1))" (str (evaluar-define '(define x 2 3) '(x 1)))))
