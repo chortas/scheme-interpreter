@@ -187,7 +187,9 @@
   [fnc lae amb]
   (cond
     (= fnc '<)            (fnc-menor lae)
-
+    (= fnc '>)            (fnc-mayor lae)
+    (= fnc '>=)           (fnc-mayor-o-igual lae)
+    (= fnc '==)           (fnc-equal? lae)
     ;
     ;
     ; Si la funcion primitiva esta identificada por un simbolo, puede determinarse mas rapido que hacer con ella
@@ -893,15 +895,14 @@
         (list elemento ambiente)))
 
 (defn unir-lambda [definicion lambda]
-  (reduce (fn [acum elemento] 
-          (concat acum (list elemento))) 
-          lambda (drop 2 definicion))
-)
+  (reduce (fn [acum elemento]
+            (concat acum (list elemento)))
+          lambda (drop 2 definicion)))
 
 (defn formatear-lambda [definicion ambiente unspecified]
-  (list unspecified 
-    (concat ambiente 
-            (list (first (second definicion)) (unir-lambda definicion (list 'lambda (list (second (second definicion)))))))))
+  (list unspecified
+        (concat ambiente
+                (list (first (second definicion)) (unir-lambda definicion (list 'lambda (list (second (second definicion)))))))))
 
 ; user=> (evaluar-define '(define x 2) '(x 1))
 ; (#<unspecified> (x 2))
@@ -964,8 +965,14 @@
 ; (5 (#f #f #t #t))
 ; user=> (evaluar-or (list 'or (symbol "#f")) (list (symbol "#f") (symbol "#f") (symbol "#t") (symbol "#t")))
 ; (#f (#f #f #t #t))
-(defn evaluar-or []
-  "Evalua una expresion `or`.  Devuelve una lista con el resultado y un ambiente.")
+(defn evaluar-or
+  "Evalua una expresion `or`.  Devuelve una lista con el resultado y un ambiente."
+  [evaluacion ambiente]
+  (let [elemento-falso (symbol "#f") elementos (cons elemento-falso (drop 1 evaluacion))]
+  (list (reduce (fn [acum elemento]
+           (let [elemento-evaluado (first (evaluar elemento ambiente))]
+           (cond (not (= elemento-falso elemento-evaluado)) (reduced elemento-evaluado)
+           :else acum))) elemento-falso elementos) ambiente)))
 
 ; user=> (evaluar-set! '(set! x 1) '(x 0))
 ; (#<unspecified> (x 1))
