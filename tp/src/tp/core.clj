@@ -606,8 +606,8 @@
   "Busca una clave en un ambiente (una lista con claves en las posiciones impares [1, 3, 5...] y valores en las pares [2, 4, 6...]
    y devuelve el valor asociado. Devuelve un error :unbound-variable si no la encuentra."
   [clave ambiente]
-  (cond (= clave (nth ambiente 0)) (nth ambiente 1)
-        (= 1 (count ambiente)) (generar-mensaje-error :unbound-variable clave)
+  (cond (<= (count ambiente) 1) (generar-mensaje-error :unbound-variable clave)
+        (= clave (nth ambiente 0)) (nth ambiente 1)
         :else
         (recur clave (pop ambiente))))
 
@@ -620,7 +620,7 @@
 (defn error?
   "Devuelve true o false, segun sea o no el arg. una lista con `;ERROR:` o `;WARNING:` como primer elemento."
   [error]
-  (and (list? error) (or (= (first error) (symbol ";ERROR:")) (= (first error) (symbol ";WARNING:")))))
+  (and (seq? error) (or (= (first error) (symbol ";ERROR:")) (= (first error) (symbol ";WARNING:")))))
 
 ; user=> (proteger-bool-en-str "(or #F #f #t #T)")
 ; "(or %F %f %t %T)"
@@ -969,10 +969,10 @@
   "Evalua una expresion `or`.  Devuelve una lista con el resultado y un ambiente."
   [evaluacion ambiente]
   (let [elemento-falso (symbol "#f") elementos (cons elemento-falso (drop 1 evaluacion))]
-  (list (reduce (fn [acum elemento]
-           (let [elemento-evaluado (first (evaluar elemento ambiente))]
-           (cond (not (= elemento-falso elemento-evaluado)) (reduced elemento-evaluado)
-           :else acum))) elemento-falso elementos) ambiente)))
+    (list (reduce (fn [acum elemento]
+                    (let [elemento-evaluado (first (evaluar elemento ambiente))]
+                      (cond (not (= elemento-falso elemento-evaluado)) (reduced elemento-evaluado)
+                            :else acum))) elemento-falso elementos) ambiente)))
 
 ; user=> (evaluar-set! '(set! x 1) '(x 0))
 ; (#<unspecified> (x 1))
@@ -984,8 +984,14 @@
 ; ((;ERROR: set!: missing or extra expression (set! x 1 2)) (x 0))
 ; user=> (evaluar-set! '(set! 1 2) '(x 0))
 ; ((;ERROR: set!: bad variable 1) (x 0))
-(defn evaluar-set! []
-  "Evalua una expresion `set!`. Devuelve una lista con el resultado y un ambiente actualizado con la redefinicion.")
-
+(defn evaluar-set!
+  "Evalua una expresion `set!`. Devuelve una lista con el resultado y un ambiente actualizado con la redefinicion."
+  [evaluacion ambiente]
+  (let [unspecified (symbol "#<unspecified>") busqueda (buscar (second evaluacion) ambiente)]
+    (cond (not (= (count evaluacion) 3)) (list (generar-mensaje-error :missing-or-extra (first evaluacion) evaluacion) ambiente)
+          :else
+          (cond (symbol? (second evaluacion)) (cond (error? busqueda) (list busqueda ambiente)
+                                                    :else (list unspecified (actualizar-amb ambiente (second evaluacion) (nth evaluacion 2))))
+                :else (list (generar-mensaje-error :bad-variable (first evaluacion) (second evaluacion)) ambiente)))))
 
 ; Al terminar de cargar el archivo en el REPL de Clojure, se debe devolver true.
