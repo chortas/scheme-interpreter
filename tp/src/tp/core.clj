@@ -662,7 +662,7 @@
   "Cambia, en un codigo leido con read-string, %t por #t y %f por #f (y sus respectivas versiones en mayusculas)."
   [codigo]
   (map (fn [elemento]
-         (cond (list? elemento) (restaurar-bool elemento)
+         (cond (seq? elemento) (restaurar-bool elemento)
                (symbol? elemento) (symbol (st/replace (str elemento) #"%t|%f|%T|%F" {"%t" "#t" "%f" "#f" "%T" "#T" "%F" "#F"}))
                :else elemento)) codigo))
 
@@ -683,7 +683,7 @@
 
 (defn fnc-append-aux [lista resultado i]
   (cond (= i (count lista)) resultado
-        (not (list? (nth lista i))) (generar-mensaje-error :wrong-type-arg "append" (nth lista i))
+        (not (seq? (nth lista i))) (generar-mensaje-error :wrong-type-arg "append" (nth lista i))
         :else
         (recur lista (concat resultado (nth lista i)) (+ i 1))))
 
@@ -807,7 +807,7 @@
   (cond (= 0 (count elementos)) (generar-mensaje-error :wrong-number-args-oper "-")
         (= 1 (count elementos)) (- (first elementos))
         :else
-        (nth (reduce fnc-restar-aux [(first elementos) 0] (pop elementos)) 0)))
+        (nth (reduce fnc-restar-aux [(first elementos) 0] (rest elementos)) 0)))
 
 (defn fnc-cmp-aux
   [elementos cmp cmp-rep]
@@ -922,7 +922,7 @@
 (defn formatear-lambda [expresion ambiente unspecified]
   (list unspecified
         (concat ambiente
-                (list (first (second expresion)) (unir-lambda expresion (list 'lambda (list (second (second expresion)))))))))
+                (list (first (second expresion)) (unir-lambda expresion (list 'lambda (rest (second expresion))))))))
 
 ; user=> (evaluar-define '(define x 2) '(x 1))
 ; (#<unspecified> (x 2))
@@ -950,7 +950,7 @@
       (<= (count expresion) 2) (list (generar-mensaje-error :missing-or-extra (first expresion) expresion) ambiente)
       (symbol? (second expresion))  (cond (= 3 (count expresion)) (list unspecified (actualizar-amb ambiente (second expresion) (first (evaluar (last expresion) ambiente))))
                                           :else (list (generar-mensaje-error :missing-or-extra (first expresion) expresion) ambiente))
-      (and (list? (second expresion)) (not (empty? (second expresion)))) (cond (and (>= (count expresion) 3) (list? (nth expresion 2))) (formatear-lambda expresion ambiente unspecified))
+      (and (seq? (second expresion)) (not (empty? (second expresion)))) (cond (and (>= (count expresion) 3) (seq? (nth expresion 2))) (formatear-lambda expresion ambiente unspecified))
       :else
       (list (generar-mensaje-error :bad-variable (first expresion) expresion) ambiente))))
 
@@ -1002,7 +1002,7 @@
 (defn evaluar-or
   "Evalua una expresion `or`.  Devuelve una lista con el resultado y un ambiente."
   [expresion ambiente]
-  (let [elemento-falso (symbol "#f") elementos (cons elemento-falso (drop 1 expresion))]
+  (let [elemento-falso (symbol "#f") elementos (cons elemento-falso (rest expresion))]
     (list (reduce (fn [acum elemento]
                     (let [elemento-evaluado (first (evaluar elemento ambiente))]
                       (cond (not (= elemento-falso elemento-evaluado)) (reduced elemento-evaluado)
