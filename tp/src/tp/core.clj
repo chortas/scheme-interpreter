@@ -619,6 +619,12 @@
         :else
         (reemplazar ambiente clave valor 0)))
 
+(defn buscar-aux [clave ambiente idx]
+  (cond (<= (count ambiente) 1) (generar-mensaje-error :unbound-variable clave)
+        (and (igual? clave (first ambiente)) (even? idx)) (second ambiente)
+        :else
+        (recur clave (rest ambiente) (+ idx 1))))
+
 ; user=> (buscar 'c '(a 1 b 2 c 3 d 4 e 5))
 ; 3
 ; user=> (buscar 'f '(a 1 b 2 c 3 d 4 e 5))
@@ -627,10 +633,7 @@
   "Busca una clave en un ambiente (una lista con claves en las posiciones impares [1, 3, 5...] y valores en las pares [2, 4, 6...]
    y devuelve el valor asociado. Devuelve un error :unbound-variable si no la encuentra."
   [clave ambiente]
-  (cond (<= (count ambiente) 1) (generar-mensaje-error :unbound-variable clave)
-        (igual? clave (first ambiente)) (nth ambiente 1)
-        :else
-        (recur clave (rest ambiente))))
+  (buscar-aux clave ambiente 0))
 
 ; user=> (error? (list (symbol ";ERROR:") 'mal 'hecho))
 ; true  
@@ -1019,13 +1022,13 @@
 ; user=> (evaluar-set! '(set! 1 2) '(x 0))
 ; ((;ERROR: set!: bad variable 1) (x 0))
 (defn evaluar-set!
-  "Evalua una expresion `set!`. Devuelve una lista con el resultado y un ambiente actualizado con la reexpresion."
+  "Evalua una expresion set!. Devuelve una lista con el resultado y un ambiente actualizado con la reexpresion."
   [expresion ambiente]
   (let [unspecified (symbol "#<unspecified>") busqueda (buscar (second expresion) ambiente)]
     (cond (not (= (count expresion) 3)) (list (generar-mensaje-error :missing-or-extra (first expresion) expresion) ambiente)
           :else
           (cond (symbol? (second expresion)) (cond (error? busqueda) (list busqueda ambiente)
-                                                   :else (list unspecified (actualizar-amb ambiente (second expresion) (nth expresion 2))))
+                                                   :else (list unspecified (actualizar-amb ambiente (second expresion) (first (evaluar (nth expresion 2) ambiente)))))
                 :else (list (generar-mensaje-error :bad-variable (first expresion) (second expresion)) ambiente)))))
 
 ; Al terminar de cargar el archivo en el REPL de Clojure, se debe devolver true.
