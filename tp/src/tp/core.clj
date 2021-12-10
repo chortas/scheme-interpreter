@@ -217,7 +217,6 @@
     (igual? fnc 'equal?) (fnc-equal? lae)
     (igual? fnc 'length) (fnc-length lae)
     (igual? fnc 'display) (fnc-display lae)
-    (igual? fnc 'display) (fnc-display lae)
     (igual? fnc 'newline) (fnc-newline lae)
     (igual? fnc 'reverse) (fnc-reverse lae)
 
@@ -631,7 +630,7 @@
   (cond (<= (count ambiente) 1) (generar-mensaje-error :unbound-variable clave)
         (= clave (nth ambiente 0)) (nth ambiente 1)
         :else
-        (recur clave (pop ambiente))))
+        (recur clave (rest ambiente))))
 
 ; user=> (error? (list (symbol ";ERROR:") 'mal 'hecho))
 ; true  
@@ -664,7 +663,7 @@
   [codigo]
   (map (fn [elemento]
          (cond (list? elemento) (restaurar-bool elemento)
-               (symbol? elemento) (symbol (st/replace elemento #"%t|%f|%T|%F" {"%t" "#t" "%f" "#f" "%T" "#T" "%F" "#F"}))
+               (symbol? elemento) (symbol (st/replace (str elemento) #"%t|%f|%T|%F" {"%t" "#t" "%f" "#f" "%T" "#T" "%F" "#F"}))
                :else elemento)) codigo))
 
 ; user=> (igual? 'if 'IF)
