@@ -655,10 +655,6 @@
   [cadena]
   (st/replace cadena #"#t|#f|#T|#F" {"#t" "%t" "#f" "%f" "#T" "%T" "#F" "%F"}))
 
-(defn map-bool [elemento]
-  (cond (symbol? elemento) (symbol (st/replace (str elemento) #"%t|%f|%T|%F" {"%t" "#t" "%f" "#f" "%T" "#T" "%F" "#F"}))
-        :else (map map-bool elemento)))
-
 ; user=> (restaurar-bool (read-string (proteger-bool-en-str "(and (or #F #f #t #T) #T)")))
 ; (and (or #F #f #t #T) #T)
 ; user=> (restaurar-bool (read-string "(and (or %F %f %t %T) %T)") )
@@ -667,8 +663,9 @@
   "Cambia, en un codigo leido con read-string, %t por #t y %f por #f (y sus respectivas versiones en mayusculas)."
   [codigo]
   (map (fn [elemento]
-         (cond (symbol? elemento) (symbol (st/replace (str elemento) #"%t|%f|%T|%F" {"%t" "#t" "%f" "#f" "%T" "#T" "%F" "#F"}))
-               :else (restaurar-bool elemento))) codigo))
+         (cond (list? elemento) (restaurar-bool elemento)
+               (symbol? elemento) (symbol (st/replace elemento #"%t|%f|%T|%F" {"%t" "#t" "%f" "#f" "%T" "#T" "%F" "#F"}))
+               :else elemento)) codigo))
 
 ; user=> (igual? 'if 'IF)
 ; true
