@@ -948,7 +948,7 @@
   (let [unspecified (symbol "#<unspecified>")]
     (cond
       (<= (count expresion) 2) (list (generar-mensaje-error :missing-or-extra (first expresion) expresion) ambiente)
-      (symbol? (second expresion))  (cond (= 3 (count expresion)) (list unspecified (actualizar-amb ambiente (second expresion) (last expresion)))
+      (symbol? (second expresion))  (cond (= 3 (count expresion)) (list unspecified (actualizar-amb ambiente (second expresion) (first (evaluar (last expresion) ambiente))))
                                           :else (list (generar-mensaje-error :missing-or-extra (first expresion) expresion) ambiente))
       (and (list? (second expresion)) (not (empty? (second expresion)))) (cond (and (>= (count expresion) 3) (list? (nth expresion 2))) (formatear-lambda expresion ambiente unspecified))
       :else
