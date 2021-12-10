@@ -183,5 +183,3 @@
     (is (= "((;ERROR: set!: missing or extra expression (set! x)) (x 0))" (str (evaluar-set! '(set! x) '(x 0)))))
     (is (= "((;ERROR: set!: missing or extra expression (set! x 1 2)) (x 0))" (str (evaluar-set! '(set! x 1 2) '(x 0)))))
     (is (= "((;ERROR: set!: bad variable 1) (x 0))" (str (evaluar-set! '(set! 1 2) '(x 0)))))))
-
-

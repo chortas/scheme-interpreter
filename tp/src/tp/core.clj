@@ -197,14 +197,29 @@
     (= fnc '>)            (fnc-mayor lae)
     (= fnc '>=)           (fnc-mayor-o-igual lae)
     (= fnc '==)           (fnc-equal? lae)
+    (= fnc '+)           (fnc-sumar lae)
+    (= fnc '-)           (fnc-restar lae)
     ;
     ;
     ; Si la funcion primitiva esta identificada por un simbolo, puede determinarse mas rapido que hacer con ella
     ;
     ;
-
-
     (igual? fnc 'append)  (fnc-append lae)
+    (igual? fnc 'car) (fnc-car lae)
+    (igual? fnc 'cdr) (fnc-cdr lae)
+    (igual? fnc 'env) (fnc-env lae)
+    (igual? fnc 'not) (fnc-not lae)
+    (igual? fnc 'cons) (fnc-cons lae)
+    (igual? fnc 'list) (fnc-list lae)
+    (igual? fnc 'list?) (fnc-list? lae)
+    (igual? fnc 'read) (fnc-read lae)
+    (igual? fnc 'null?) (fnc-null? lae)
+    (igual? fnc 'equal?) (fnc-equal? lae)
+    (igual? fnc 'length) (fnc-length lae)
+    (igual? fnc 'display) (fnc-display lae)
+    (igual? fnc 'display) (fnc-display lae)
+    (igual? fnc 'newline) (fnc-newline lae)
+    (igual? fnc 'reverse) (fnc-reverse lae)
 
     ;
     ;
