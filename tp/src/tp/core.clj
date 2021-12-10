@@ -582,7 +582,7 @@
   [ambiente clave i]
   (cond
     (or (= (+ i 1) (count ambiente)) (empty? ambiente)) -1
-    (= clave (nth ambiente i)) (+ i 1)
+    (igual? clave (nth ambiente i)) (+ i 1)
     :else
     (recur ambiente clave (+ i 1))))
 
@@ -628,7 +628,7 @@
    y devuelve el valor asociado. Devuelve un error :unbound-variable si no la encuentra."
   [clave ambiente]
   (cond (<= (count ambiente) 1) (generar-mensaje-error :unbound-variable clave)
-        (= clave (nth ambiente 0)) (nth ambiente 1)
+        (igual? clave (first ambiente)) (nth ambiente 1)
         :else
         (recur clave (rest ambiente))))
 
