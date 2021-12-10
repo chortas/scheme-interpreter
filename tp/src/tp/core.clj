@@ -126,14 +126,21 @@
     (list expre amb)                                      ; de lo contrario, evaluarla
     (cond
       (not (seq? expre))             (evaluar-escalar expre amb)
-
       (igual? (first expre) 'define) (evaluar-define expre amb)
-
+      (igual? (first expre) 'if) (evaluar-if expre amb)
+      (igual? (first expre) 'or) (evaluar-or expre amb)
+      (igual? (first expre) 'set!) (evaluar-set! expre amb)
+      (igual? (first expre) 'cond) (evaluar-cond expre amb)
+      (igual? (first expre) 'eval) (evaluar-eval expre amb)
+      (igual? (first expre) 'exit) (evaluar-exit expre amb)
+      (igual? (first expre) 'load) (evaluar-load expre amb)
+      (igual? (first expre) 'quote) (evaluar-quote expre amb)
+      (igual? (first expre) 'lambda) (evaluar-lambda expre amb)
          ;
          ;
          ;
          ; Si la expresion no es la aplicacion de una funcion (es una forma especial, una macro...) debe ser evaluada
-         ; por una funcion de Clojure especifica debido a que puede ser necesario evitar la evaluacion de los argumentos
+         ; por una funcion de Clojure especifica debido a que puede ser necesario evitar la expresion de los argumentos
          ;
          ;
          ;
@@ -372,7 +379,7 @@
         :else (evaluar-secuencia-en-cond (nfirst lis) (second res-eval))))))
 
 (defn evaluar-secuencia-en-cond
-  "Evalua secuencialmente las sublistas de `lis`. Devuelve el valor de la ultima evaluacion."
+  "Evalua secuencialmente las sublistas de `lis`. Devuelve el valor de la ultima expresion."
   [lis amb]
   (if (nil? (next lis))
     (evaluar (first lis) amb)
@@ -890,19 +897,20 @@
 (defn evaluar-escalar
   "Evalua una expresion escalar. Devuelve una lista con el resultado y un ambiente."
   [elemento ambiente]
-  (cond (symbol? elemento) (list (buscar elemento ambiente) ambiente)
-        :else
-        (list elemento ambiente)))
+  (let [unspecified (symbol "#<unspecified>")]
+    (cond (and (symbol? elemento) (not (= elemento unspecified))) (list (buscar elemento ambiente) ambiente)
+          :else
+          (list elemento ambiente))))
 
-(defn unir-lambda [definicion lambda]
+(defn unir-lambda [expresion lambda]
   (reduce (fn [acum elemento]
             (concat acum (list elemento)))
-          lambda (drop 2 definicion)))
+          lambda (drop 2 expresion)))
 
-(defn formatear-lambda [definicion ambiente unspecified]
+(defn formatear-lambda [expresion ambiente unspecified]
   (list unspecified
         (concat ambiente
-                (list (first (second definicion)) (unir-lambda definicion (list 'lambda (list (second (second definicion)))))))))
+                (list (first (second expresion)) (unir-lambda expresion (list 'lambda (list (second (second expresion)))))))))
 
 ; user=> (evaluar-define '(define x 2) '(x 1))
 ; (#<unspecified> (x 2))
@@ -923,16 +931,16 @@
 ; user=> (evaluar-define '(define 2 x) '(x 1))
 ; ((;ERROR: define: bad variable (define 2 x)) (x 1))
 (defn evaluar-define
-  "Evalua una expresion `define`. Devuelve una lista con el resultado y un ambiente actualizado con la definicion."
-  [definicion ambiente]
+  "Evalua una expresion `define`. Devuelve una lista con el resultado y un ambiente actualizado con la expresion."
+  [expresion ambiente]
   (let [unspecified (symbol "#<unspecified>")]
     (cond
-      (<= (count definicion) 2) (list (generar-mensaje-error :missing-or-extra (first definicion) definicion) ambiente)
-      (symbol? (second definicion))  (cond (= 3 (count definicion)) (list unspecified (actualizar-amb ambiente (second definicion) (last definicion)))
-                                           :else (list (generar-mensaje-error :missing-or-extra (first definicion) definicion) ambiente))
-      (and (list? (second definicion)) (not (empty? (second definicion)))) (cond (and (>= (count definicion) 3) (list? (nth definicion 2))) (formatear-lambda definicion ambiente unspecified))
+      (<= (count expresion) 2) (list (generar-mensaje-error :missing-or-extra (first expresion) expresion) ambiente)
+      (symbol? (second expresion))  (cond (= 3 (count expresion)) (list unspecified (actualizar-amb ambiente (second expresion) (last expresion)))
+                                          :else (list (generar-mensaje-error :missing-or-extra (first expresion) expresion) ambiente))
+      (and (list? (second expresion)) (not (empty? (second expresion)))) (cond (and (>= (count expresion) 3) (list? (nth expresion 2))) (formatear-lambda expresion ambiente unspecified))
       :else
-      (list (generar-mensaje-error :bad-variable (first definicion) definicion) ambiente))))
+      (list (generar-mensaje-error :bad-variable (first expresion) expresion) ambiente))))
 
 ; user=> (evaluar-if '(if 1 2) '(n 7))
 ; (2 (n 7))
@@ -951,9 +959,21 @@
 ; user=> (evaluar-if '(if 1) '(n 7))
 ; ((;ERROR: if: missing or extra expression (if 1)) (n 7))
 
+(defn buscar-if [expresion ambiente idx]
+  (cond (<= (count expresion) idx) (symbol "#<unspecified>")
+        :else
+        (let [elemento (nth expresion idx) valor (buscar elemento ambiente)]
+          (cond (error? valor) elemento
+                :else valor))))
 
-(defn evaluar-if []
-  "Evalua una expresion `if`. Devuelve una lista con el resultado y un ambiente eventualmente modificado.")
+(defn evaluar-if
+  "Evalua una expresion `if`. Devuelve una lista con el resultado y un ambiente eventualmente modificado."
+  [expresion ambiente]
+  (let [elemento-evaluado (first (evaluar (second expresion) ambiente))]
+    (cond (<= (count expresion) 2) (list (generar-mensaje-error :missing-or-extra (first expresion) expresion) ambiente)
+          (= (symbol "#f") elemento-evaluado) (evaluar (buscar-if expresion ambiente 3) ambiente)
+          :else (evaluar (buscar-if expresion ambiente 2) ambiente))))
+
 
 ; user=> (evaluar-or (list 'or) (list (symbol "#f") (symbol "#f") (symbol "#t") (symbol "#t")))
 ; (#f (#f #f #t #t))
@@ -965,10 +985,12 @@
 ; (5 (#f #f #t #t))
 ; user=> (evaluar-or (list 'or (symbol "#f")) (list (symbol "#f") (symbol "#f") (symbol "#t") (symbol "#t")))
 ; (#f (#f #f #t #t))
+
+
 (defn evaluar-or
   "Evalua una expresion `or`.  Devuelve una lista con el resultado y un ambiente."
-  [evaluacion ambiente]
-  (let [elemento-falso (symbol "#f") elementos (cons elemento-falso (drop 1 evaluacion))]
+  [expresion ambiente]
+  (let [elemento-falso (symbol "#f") elementos (cons elemento-falso (drop 1 expresion))]
     (list (reduce (fn [acum elemento]
                     (let [elemento-evaluado (first (evaluar elemento ambiente))]
                       (cond (not (= elemento-falso elemento-evaluado)) (reduced elemento-evaluado)
@@ -985,13 +1007,13 @@
 ; user=> (evaluar-set! '(set! 1 2) '(x 0))
 ; ((;ERROR: set!: bad variable 1) (x 0))
 (defn evaluar-set!
-  "Evalua una expresion `set!`. Devuelve una lista con el resultado y un ambiente actualizado con la redefinicion."
-  [evaluacion ambiente]
-  (let [unspecified (symbol "#<unspecified>") busqueda (buscar (second evaluacion) ambiente)]
-    (cond (not (= (count evaluacion) 3)) (list (generar-mensaje-error :missing-or-extra (first evaluacion) evaluacion) ambiente)
+  "Evalua una expresion `set!`. Devuelve una lista con el resultado y un ambiente actualizado con la reexpresion."
+  [expresion ambiente]
+  (let [unspecified (symbol "#<unspecified>") busqueda (buscar (second expresion) ambiente)]
+    (cond (not (= (count expresion) 3)) (list (generar-mensaje-error :missing-or-extra (first expresion) expresion) ambiente)
           :else
-          (cond (symbol? (second evaluacion)) (cond (error? busqueda) (list busqueda ambiente)
-                                                    :else (list unspecified (actualizar-amb ambiente (second evaluacion) (nth evaluacion 2))))
-                :else (list (generar-mensaje-error :bad-variable (first evaluacion) (second evaluacion)) ambiente)))))
+          (cond (symbol? (second expresion)) (cond (error? busqueda) (list busqueda ambiente)
+                                                   :else (list unspecified (actualizar-amb ambiente (second expresion) (nth expresion 2))))
+                :else (list (generar-mensaje-error :bad-variable (first expresion) (second expresion)) ambiente)))))
 
 ; Al terminar de cargar el archivo en el REPL de Clojure, se debe devolver true.

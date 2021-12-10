@@ -157,6 +157,17 @@
     (is (= "((;ERROR: define: bad variable (define () 2)) (x 1))" (str (evaluar-define '(define () 2) '(x 1)))))
     (is (= "((;ERROR: define: bad variable (define 2 x)) (x 1))" (str (evaluar-define '(define 2 x) '(x 1)))))))
 
+(deftest evaluar-if-test
+  (testing "Funcion evaluar-if")
+  (is (= '(2 (n 7)) (evaluar-if '(if 1 2) '(n 7))))
+  (is (= '(7 (n 7)) (evaluar-if '(if 1 n) '(n 7))))
+  (is (= '(7 (n 7)) (evaluar-if '(if 1 n 8) '(n 7))))
+  (is (= (list (symbol "#<unspecified>") (list 'n 7 (symbol "#f") (symbol "#f"))) (evaluar-if (list 'if (symbol "#f") 'n) (list 'n 7 (symbol "#f") (symbol "#f")))))
+  (is (= (list 8 (list 'n 7 (symbol "#f") (symbol "#f"))) (evaluar-if (list 'if (symbol "#f") 'n 8) (list 'n 7 (symbol "#f") (symbol "#f")))))
+  (is (= (list (symbol "#<unspecified>") (list 'n 9 (symbol "#f") (symbol "#f"))) (evaluar-if (list 'if (symbol "#f") 'n '(set! n 9)) (list 'n 7 (symbol "#f") (symbol "#f")))))
+  (is (= "((;ERROR: if: missing or extra expression (if)) (n 7))" (str (evaluar-if '(if) '(n 7)))))
+  (is (= "((;ERROR: if: missing or extra expression (if 1)) (n 7))" (str (evaluar-if '(if 1) '(n 7))))))
+
 (deftest evaluar-or-test
   (testing "Funcion evaluar-or"
     (is (= (list (symbol "#f") (list (symbol "#f") (symbol "#f") (symbol "#t") (symbol "#t"))) (evaluar-or (list 'or) (list (symbol "#f") (symbol "#f") (symbol "#t") (symbol "#t")))))
@@ -173,4 +184,4 @@
     (is (= "((;ERROR: set!: missing or extra expression (set! x 1 2)) (x 0))" (str (evaluar-set! '(set! x 1 2) '(x 0)))))
     (is (= "((;ERROR: set!: bad variable 1) (x 0))" (str (evaluar-set! '(set! 1 2) '(x 0)))))))
 
-    
+
