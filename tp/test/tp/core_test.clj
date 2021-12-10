@@ -17,7 +17,6 @@
     (is (= 3 (buscar 'c '(a 1 b 2 c 3 d 4 e 5))))
     (is (= 4 (buscar 'd '(a 1 b 2 c 3 d 4 e 5))))
     (is (= 5 (buscar 'e '(a 1 b 2 c 3 d 4 e 5))))
-    (is (= 5 (buscar 'E '(a 1 b 2 c 3 d 4 e 5))))
     (is (= "(;ERROR: unbound variable: f)" (str (buscar 'f '(a 1 b 2 c 3 d 4 e 5)))))))
 
 (deftest error?-test
@@ -30,7 +29,6 @@
   (testing "Funcion actualizar-amb"
     (is (= '(a 1 b 2 c 3 d 4) (actualizar-amb '(a 1 b 2 c 3) 'd 4)))
     (is (= '(a 1 b 4 c 3) (actualizar-amb '(a 1 b 2 c 3) 'b 4)))
-    (is (= '(a 1 b 4 c 3) (actualizar-amb '(a 1 b 2 c 3) 'B 4)))
     (is (= '(a 1 b 2 c 3) (actualizar-amb '(a 1 b 2 c 3) 'b (list (symbol ";ERROR:") 'mal 'hecho))))
     (is (= '(b 7) (actualizar-amb () 'b 7)))))
 
@@ -181,7 +179,6 @@
 (deftest evaluar-set-test
   (testing "Funcion evaluar-set"
     (is (= (list (symbol "#<unspecified>") (list (symbol "x") 1)) (evaluar-set! '(set! x 1) '(x 0))))
-    (is (= (list (symbol "#<unspecified>") (list (symbol "x") 1)) (evaluar-set! '(set! X 1) '(x 0))))
     (is (= "((;ERROR: unbound variable: x) ())" (str (evaluar-set! '(set! x 1) '()))))
     (is (= "((;ERROR: set!: missing or extra expression (set! x)) (x 0))" (str (evaluar-set! '(set! x) '(x 0)))))
     (is (= "((;ERROR: set!: missing or extra expression (set! x 1 2)) (x 0))" (str (evaluar-set! '(set! x 1 2) '(x 0)))))
