@@ -748,7 +748,7 @@
 (defn fnc-read
   "Devuelve la lectura de un elemento de Scheme desde la terminal/consola."
   [args]
-  (cond (empty? args) (symbol (leer-entrada))
+  (cond (empty? args) (read-string (leer-entrada))
         (= 1 (count args)) (generar-mensaje-error :io-ports-not-implemented "read")
         :else (generar-mensaje-error :wrong-number-args-prim-proc "read")))
 
