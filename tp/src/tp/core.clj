@@ -536,8 +536,6 @@
 ; user=> (leer-entrada)
 ; 123
 ; "123"
-
-
 (defn leer-entrada-aux [acum]
   "Lee una cadena desde la terminal/consola. Si los parentesis no estan correctamente balanceados al presionar Enter/Intro,
    se considera que la cadena ingresada es una subcadena y el ingreso continua. De lo contrario, se la devuelve completa."
