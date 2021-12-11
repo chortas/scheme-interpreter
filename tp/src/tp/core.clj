@@ -683,7 +683,8 @@
   "Verifica la igualdad entre dos elementos al estilo de Scheme (case-insensitive)"
   [elemento1 elemento2]
   (or (and (int? elemento1) (int? elemento2) (= elemento1 elemento2))
-    (and (= (type elemento1) (type elemento2)) (= (st/lower-case (str elemento1)) (st/lower-case  (str elemento2))))))
+      (and (seq? elemento1) (seq? elemento2) (= elemento1 elemento2))
+      (and (= (type elemento1) (type elemento2)) (= (st/lower-case (str elemento1)) (st/lower-case  (str elemento2))))))
 
 (defn fnc-append-aux [lista resultado i]
   (cond (= i (count lista)) resultado
