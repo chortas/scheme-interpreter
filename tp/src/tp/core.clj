@@ -528,6 +528,15 @@
 
 ; FUNCIONES QUE DEBEN SER IMPLEMENTADAS PARA COMPLETAR EL INTERPRETE DE SCHEME (ADEMAS DE COMPLETAR `EVALUAR` Y `APLICAR-FUNCION-PRIMITIVA`):
 
+; LEER-ENTRADA:
+; user=> (leer-entrada)
+; (hola
+; mundo)
+; "(hola mundo)"
+; user=> (leer-entrada)
+; 123
+; "123"
+
 
 (defn leer-entrada-aux [acum]
   "Lee una cadena desde la terminal/consola. Si los parentesis no estan correctamente balanceados al presionar Enter/Intro,
@@ -537,28 +546,11 @@
           :else
           (recur (str cadena " ")))))
 
-; LEER-ENTRADA:
-; user=> (leer-entrada)
-; (hola
-; mundo)
-; "(hola mundo)"
-; user=> (leer-entrada)
-; 123
-; "123"
 (defn leer-entrada
   "Lee una cadena desde la terminal/consola. Si los parentesis no estan correctamente balanceados al presionar Enter/Intro,
    se considera que la cadena ingresada es una subcadena y el ingreso continua. De lo contrario, se la devuelve completa."
   []
   (leer-entrada-aux ""))
-
-(defn sumar-caracteres
-  "Suma 1 al contador si el caracter es '(' y resta uno si el caracter es '("
-  [contador caracter]
-  (cond
-    (= caracter \() (+ contador 1)
-    (= caracter \)) (- contador 1)
-    :else
-    contador))
 
 ; user=> (verificar-parentesis "(hola 'mundo")
 ; 1
@@ -570,6 +562,15 @@
 ; -1
 ; user=> (verificar-parentesis "(hola '(mundo) )")
 ; 0
+(defn sumar-caracteres
+  "Suma 1 al contador si el caracter es '(' y resta uno si el caracter es '("
+  [contador caracter]
+  (cond
+    (= caracter \() (+ contador 1)
+    (= caracter \)) (- contador 1)
+    :else
+    contador))
+
 (defn verificar-parentesis
   "Cuenta los parentesis en una cadena, sumando 1 si `(`, restando 1 si `)`. Si el contador se hace negativo, para y retorna -1."
   [cadena]
@@ -577,6 +578,14 @@
             (if (= acumulador -1) (reduced -1) (sumar-caracteres acumulador c)))
           0 cadena))
 
+; user=> (actualizar-amb '(a 1 b 2 c 3) 'd 4)
+; (a 1 b 2 c 3 d 4)
+; user=> (actualizar-amb '(a 1 b 2 c 3) 'b 4)
+; (a 1 b 4 c 3)
+; user=> (actualizar-amb '(a 1 b 2 c 3) 'b (list (symbol ";ERROR:") 'mal 'hecho))
+; (a 1 b 2 c 3)
+; user=> (actualizar-amb () 'b 7)
+; (b 7)
 (defn obtener-indice
   "Dado un ambiente y una clave obtiene el indice donde esta el valor asociado a la clave"
   [ambiente clave i]
@@ -603,14 +612,6 @@
       :else
       (reemplazar-aux ambiente indice valor))))
 
-; user=> (actualizar-amb '(a 1 b 2 c 3) 'd 4)
-; (a 1 b 2 c 3 d 4)
-; user=> (actualizar-amb '(a 1 b 2 c 3) 'b 4)
-; (a 1 b 4 c 3)
-; user=> (actualizar-amb '(a 1 b 2 c 3) 'b (list (symbol ";ERROR:") 'mal 'hecho))
-; (a 1 b 2 c 3)
-; user=> (actualizar-amb () 'b 7)
-; (b 7)
 (defn actualizar-amb
   "Devuelve un ambiente actualizado con una clave (nombre de la variable o funcion) y su valor. 
   Si el valor es un error, el ambiente no se modifica. De lo contrario, se le carga o reemplaza la nueva informacion."
@@ -619,16 +620,19 @@
         :else
         (reemplazar ambiente clave valor 0)))
 
-(defn buscar-aux [clave ambiente idx]
+; user=> (buscar 'c '(a 1 b 2 c 3 d 4 e 5))
+; 3
+; user=> (buscar 'f '(a 1 b 2 c 3 d 4 e 5))
+; (;ERROR: unbound variable: f)
+(defn buscar-aux
+  "Busca una clave en un ambiente (una lista con claves en las posiciones impares [1, 3, 5...] y valores en las pares [2, 4, 6...]
+   y devuelve el valor asociado. Devuelve un error :unbound-variable si no la encuentra."
+  [clave ambiente idx]
   (cond (<= (count ambiente) 1) (generar-mensaje-error :unbound-variable clave)
         (and (igual? clave (first ambiente)) (even? idx)) (second ambiente)
         :else
         (recur clave (rest ambiente) (+ idx 1))))
 
-; user=> (buscar 'c '(a 1 b 2 c 3 d 4 e 5))
-; 3
-; user=> (buscar 'f '(a 1 b 2 c 3 d 4 e 5))
-; (;ERROR: unbound variable: f)
 (defn buscar
   "Busca una clave en un ambiente (una lista con claves en las posiciones impares [1, 3, 5...] y valores en las pares [2, 4, 6...]
    y devuelve el valor asociado. Devuelve un error :unbound-variable si no la encuentra."
@@ -686,28 +690,23 @@
       (and (seq? elemento1) (seq? elemento2) (= elemento1 elemento2))
       (and (= (type elemento1) (type elemento2)) (= (st/lower-case (str elemento1)) (st/lower-case  (str elemento2))))))
 
-(defn fnc-append-aux [lista resultado i]
-  (cond (= i (count lista)) resultado
-        (not (seq? (nth lista i))) (generar-mensaje-error :wrong-type-arg "append" (nth lista i))
-        :else
-        (recur lista (concat resultado (nth lista i)) (+ i 1))))
-
 ; user=> (fnc-append '( (1 2) (3) (4 5) (6 7)))
 ; (1 2 3 4 5 6 7)
 ; user=> (fnc-append '( (1 2) 3 (4 5) (6 7)))
 ; (;ERROR: append: Wrong type in arg 3)
 ; user=> (fnc-append '( (1 2) A (4 5) (6 7)))
 ; (;ERROR: append: Wrong type in arg A)
+(defn fnc-append-aux [lista resultado i]
+  "Devuelve el resultado de fusionar listas."
+  (cond (= i (count lista)) resultado
+        (not (seq? (nth lista i))) (generar-mensaje-error :wrong-type-arg "append" (nth lista i))
+        :else
+        (recur lista (concat resultado (nth lista i)) (+ i 1))))
+
 (defn fnc-append
   "Devuelve el resultado de fusionar listas."
   [lista]
   (fnc-append-aux lista (empty list) 0))
-
-(defn bool-a-symbol
-  [booleano]
-  (cond (not (boolean? booleano)) booleano
-        booleano (symbol "#t")
-        :else (symbol "#f")))
 
 ; user=> (fnc-equal? ())
 ; #t
@@ -725,6 +724,13 @@
 ; #t
 ; user=> (fnc-equal? '(1 1 2 1))
 ; #f
+(defn bool-a-symbol
+  "Transforma un elemento en un simbolo que representa el booleano. Si no es un booleano lo devuelve"
+  [booleano]
+  (cond (not (boolean? booleano)) booleano
+        booleano (symbol "#t")
+        :else (symbol "#f")))
+
 (defn fnc-equal?
   "Compara elementos. Si son iguales, devuelve #t. Si no, #f."
   [elementos]
@@ -753,14 +759,6 @@
         (= 1 (count args)) (generar-mensaje-error :io-ports-not-implemented "read")
         :else (generar-mensaje-error :wrong-number-args-prim-proc "read")))
 
-(defn fnc-sumar-aux
-  [[acumulador i] elemento]
-  (cond
-    (and (not (number? elemento)) (= 0 i)) (reduced [(generar-mensaje-error :wrong-type-arg1 "+" elemento) i])
-    (not (number? elemento)) (reduced [(generar-mensaje-error :wrong-type-arg2 "+" elemento) i])
-    :else
-    [(+ acumulador elemento) (+ i 1)]))
-
 ; user=> (fnc-sumar ())
 ; 0
 ; user=> (fnc-sumar '(3))
@@ -777,18 +775,19 @@
 ; (;ERROR: +: Wrong type in arg2 A)
 ; user=> (fnc-sumar '(3 4 A 6))
 ; (;ERROR: +: Wrong type in arg2 A)
+(defn fnc-sumar-aux
+  "Suma los elementos de una lista."
+  [[acumulador i] elemento]
+  (cond
+    (and (not (number? elemento)) (= 0 i)) (reduced [(generar-mensaje-error :wrong-type-arg1 "+" elemento) i])
+    (not (number? elemento)) (reduced [(generar-mensaje-error :wrong-type-arg2 "+" elemento) i])
+    :else
+    [(+ acumulador elemento) (+ i 1)]))
+
 (defn fnc-sumar
   "Suma los elementos de una lista."
   [elementos]
   (nth (reduce fnc-sumar-aux [0 0] elementos) 0))
-
-(defn fnc-restar-aux
-  [[acumulador i] elemento]
-  (cond
-    (not (number? acumulador)) (reduced [(generar-mensaje-error :wrong-type-arg1 "-" acumulador) i])
-    (not (number? elemento)) (reduced [(generar-mensaje-error :wrong-type-arg2 "-" elemento) i])
-    :else
-    [(- acumulador elemento) (+ i 1)]))
 
 ; user=> (fnc-restar ())
 ; (;ERROR: -: Wrong number of args given)
@@ -806,6 +805,15 @@
 ; (;ERROR: -: Wrong type in arg2 A)
 ; user=> (fnc-restar '(3 4 A 6))
 ; (;ERROR: -: Wrong type in arg2 A)
+(defn fnc-restar-aux
+  "Resta los elementos de un lista."
+  [[acumulador i] elemento]
+  (cond
+    (not (number? acumulador)) (reduced [(generar-mensaje-error :wrong-type-arg1 "-" acumulador) i])
+    (not (number? elemento)) (reduced [(generar-mensaje-error :wrong-type-arg2 "-" elemento) i])
+    :else
+    [(- acumulador elemento) (+ i 1)]))
+
 (defn fnc-restar
   "Resta los elementos de un lista."
   [elementos]
@@ -815,6 +823,7 @@
         (nth (reduce fnc-restar-aux [(first elementos) 0] (rest elementos)) 0)))
 
 (defn fnc-cmp-aux
+  "Funcion generica de comparacion de elementos de una lista"
   [elementos cmp cmp-rep]
   (bool-a-symbol
    (cond (empty? elementos) true
@@ -919,16 +928,6 @@
           :else
           (list elemento ambiente))))
 
-(defn unir-lambda [expresion lambda]
-  (reduce (fn [acum elemento]
-            (concat acum (list elemento)))
-          lambda (drop 2 expresion)))
-
-(defn formatear-lambda [expresion ambiente unspecified]
-  (list unspecified
-        (concat ambiente
-                (list (first (second expresion)) (unir-lambda expresion (list 'lambda (rest (second expresion))))))))
-
 ; user=> (evaluar-define '(define x 2) '(x 1))
 ; (#<unspecified> (x 2))
 ; user=> (evaluar-define '(define (f x) (+ x 1)) '(x 1))
@@ -947,6 +946,19 @@
 ; ((;ERROR: define: bad variable (define () 2)) (x 1))
 ; user=> (evaluar-define '(define 2 x) '(x 1))
 ; ((;ERROR: define: bad variable (define 2 x)) (x 1))
+(defn unir-lambda [expresion lambda]
+  "Formatea una expresion en una funcion lambda"
+  (reduce (fn [acum elemento]
+            (concat acum (list elemento)))
+          lambda (drop 2 expresion)))
+
+(defn formatear-lambda
+  "Formatea una expresion en una funcion lambda"
+  [expresion ambiente unspecified]
+  (list unspecified
+        (concat ambiente
+                (list (first (second expresion)) (unir-lambda expresion (list 'lambda (rest (second expresion))))))))
+
 (defn evaluar-define
   "Evalua una expresion `define`. Devuelve una lista con el resultado y un ambiente actualizado con la expresion."
   [expresion ambiente]
@@ -975,8 +987,8 @@
 ; ((;ERROR: if: missing or extra expression (if)) (n 7))
 ; user=> (evaluar-if '(if 1) '(n 7))
 ; ((;ERROR: if: missing or extra expression (if 1)) (n 7))
-
 (defn buscar-if [expresion ambiente idx]
+  "Funcion auxiliar para evaluar una expresion `if`. Busca el elemento a evaluar y lo devuelve"
   (cond (<= (count expresion) idx) (symbol "#<unspecified>")
         :else
         (let [elemento (nth expresion idx) valor (buscar elemento ambiente)]
@@ -991,7 +1003,6 @@
           (= (symbol "#f") elemento-evaluado) (evaluar (buscar-if expresion ambiente 3) ambiente)
           :else (evaluar (buscar-if expresion ambiente 2) ambiente))))
 
-
 ; user=> (evaluar-or (list 'or) (list (symbol "#f") (symbol "#f") (symbol "#t") (symbol "#t")))
 ; (#f (#f #f #t #t))
 ; user=> (evaluar-or (list 'or (symbol "#t")) (list (symbol "#f") (symbol "#f") (symbol "#t") (symbol "#t")))
@@ -1002,8 +1013,6 @@
 ; (5 (#f #f #t #t))
 ; user=> (evaluar-or (list 'or (symbol "#f")) (list (symbol "#f") (symbol "#f") (symbol "#t") (symbol "#t")))
 ; (#f (#f #f #t #t))
-
-
 (defn evaluar-or
   "Evalua una expresion `or`.  Devuelve una lista con el resultado y un ambiente."
   [expresion ambiente]
