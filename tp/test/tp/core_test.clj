@@ -2,6 +2,11 @@
   (:require [clojure.test :refer :all]
             [tp.core :refer :all]))
 
+(deftest leer-entrada-test
+  (testing "Funcion leer-entrada"
+    (is (= "(hola mundo)" (with-in-str "(hola\nmundo)" (leer-entrada))))
+    (is (= "123" (with-in-str "123" (leer-entrada))))))
+
 (deftest verificar-parentesis-test
   (testing "Funcion verificar-parentesis"
     (is (= 1 (verificar-parentesis "(hola 'mundo")))
@@ -71,6 +76,7 @@
 
 (deftest fnc-read-test
   (testing "Funcion fnc-read"
+    (is (= "(hola mundo)" (str (with-in-str "(hola\nmundo)" (fnc-read ())))))
     (is (= "(;ERROR: read: Use of I/O ports not implemented)" (str (fnc-read '(1)))))
     (is (= "(;ERROR: Wrong number of args given #<primitive-procedure read>)" (str (fnc-read '(1 2)))))
     (is (= "(;ERROR: Wrong number of args given #<primitive-procedure read>)" (str (fnc-read '(1 2 3)))))))
