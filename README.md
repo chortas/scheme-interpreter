@@ -1,4 +1,4 @@
-# Interpréte de Scheme en Clojure
+# Intérprete de Scheme en Clojure
 
 ## Correr el interprete
 
