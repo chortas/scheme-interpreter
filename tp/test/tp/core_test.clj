@@ -238,3 +238,15 @@
    (is (= "(;ERROR: <=: Wrong type in arg1 A)" (str (fnc-menor-o-igual '(A 1 2 3)))))
    (is (= "(;ERROR: <=: Wrong type in arg2 A)" (str (fnc-menor-o-igual '(1 A 2 3)))))
    (is (= "(;ERROR: <=: Wrong type in arg2 A)" (str (fnc-menor-o-igual '(1 2 A 3)))))))
+
+(deftest fnc-eq-test
+ (testing "Funcion fnc-eq"
+   (is (= (symbol "#t") (fnc-eq? ())))
+   (is (= (symbol "#t") (fnc-eq? '(A))))
+   (is (= (symbol "#t") (fnc-eq? '(a a))))
+   (is (= (symbol "#f") (fnc-eq? '(hello goodbye))))
+   (is (= (symbol "#f") (fnc-eq? (list (list 1 2) (list 1 2)))))
+   (is (= (symbol "#t") (fnc-eq? (list (list) (list)))))
+   (is (= (symbol "#f") (fnc-eq? '(2.5 2.5))))
+   (is (= (symbol "#t") (fnc-eq? '(a a a))))
+   (is (= (symbol "#f") (fnc-eq? '(a a b))))))

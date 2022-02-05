@@ -58,6 +58,7 @@
 (declare fnc-dividir)
 (declare fnc-igual)
 (declare fnc-menor-o-igual)
+(declare fnc-eq?)
 
 ; Funciones auxiliares
 
@@ -105,7 +106,7 @@
                'if 'if 'lambda 'lambda 'length 'length 'list 'list 'list? 'list? 'load 'load
                'newline 'newline 'nil (symbol "#f") 'not 'not 'null? 'null? 'or 'or 'quote 'quote
                'read 'read 'reverse 'reverse 'set! 'set! (symbol "#f") (symbol "#f")
-               (symbol "#t") (symbol "#t") '+ '+ '- '- '< '< '> '> '>= '>= '* '* '/ '/ '= '=)))
+               (symbol "#t") (symbol "#t") '+ '+ '- '- '< '< '> '> '>= '>= '* '* '/ '/ '= '= 'eq? 'eq?)))
   ([amb]
    (print "> ") (flush)
    (try
@@ -228,6 +229,7 @@
     (igual? fnc 'display) (fnc-display lae)
     (igual? fnc 'newline) (fnc-newline lae)
     (igual? fnc 'reverse) (fnc-reverse lae)
+    (igual? fnc 'eq?) (fnc-eq? lae)
 
     ;
     ;
@@ -747,6 +749,35 @@
          :else
          (reduce (fn [igual [elemento1 elemento2]]
                    (let [igual-aux (igual? elemento1 elemento2)]
+                     (cond (not igual-aux) (reduced false)
+                           :else (and igual igual-aux)))) true (partition 2 1 elementos)))))
+
+; user=> (fnc-eq? ())
+; #t
+; user=> (fnc-eq? '(A))
+; #t
+; user=> (fnc-eq? '(a a))
+; #t
+; user=> (fnc-eq? '(hello goodbye))
+; #f
+; user=> (fnc-eq? (list '(1 2) '(1 2)))
+; #f
+; user=> (fnc-eq? (list '() '()))
+; #t
+; user=> (fnc-eq? '(2.5 2.5))
+; #f
+; user=> (fnc-eq? '(a a a))
+; #t
+; user=> (fnc-eq? '(a a b))
+; #t
+(defn fnc-eq?
+  "Compara elementos. Si son iguales, devuelve #t. Si no, #f."
+  [elementos]
+  (bool-a-symbol
+   (cond (empty? elementos) true
+         :else
+         (reduce (fn [igual [elemento1 elemento2]]                    
+                   (let [igual-aux (or (identical? elemento1 elemento2) (and (symbol? elemento1) (symbol? elemento2) (fnc-equal? (list elemento1 elemento2))))]
                      (cond (not igual-aux) (reduced false)
                            :else (and igual igual-aux)))) true (partition 2 1 elementos)))))
 
