@@ -100,7 +100,7 @@
                'if 'if 'lambda 'lambda 'length 'length 'list 'list 'list? 'list? 'load 'load
                'newline 'newline 'nil (symbol "#f") 'not 'not 'null? 'null? 'or 'or 'quote 'quote
                'read 'read 'reverse 'reverse 'set! 'set! (symbol "#f") (symbol "#f")
-               (symbol "#t") (symbol "#t") '+ '+ '- '- '< '< '> '> '>= '>=)))
+               (symbol "#t") (symbol "#t") '+ '+ '- '- '< '< '> '> '>= '>= '* '*)))
   ([amb]
    (print "> ") (flush)
    (try
@@ -832,7 +832,7 @@
 ; 60
 ; user=> (fnc-multiplicar '(3 4 5 6))
 ; 360
-; user=> (fnc-multiplicar '(A 4 5 6))
+; user=> (fnc-multiplicar '(r))
 ; (;ERROR: *: Wrong type in arg1 A)
 ; user=> (fnc-multiplicar '(3 A 5 6))
 ; (;ERROR: *: Wrong type in arg2 A)
@@ -842,8 +842,8 @@
   "Multiplica los elementos de una lista."
   [[acumulador i] elemento]
   (cond
-    (and (not (number? elemento)) (= 0 i)) (reduced [(generar-mensaje-error :wrong-type-arg1 "+" elemento) i])
-    (not (number? elemento)) (reduced [(generar-mensaje-error :wrong-type-arg2 "+" elemento) i])
+    (and (not (number? elemento)) (= 0 i)) (reduced [(generar-mensaje-error :wrong-type-arg1 "*" elemento) i])
+    (not (number? elemento)) (reduced [(generar-mensaje-error :wrong-type-arg2 "*" elemento) i])
     :else
     [(* acumulador elemento) (+ i 1)]))
 

@@ -190,3 +190,14 @@
     (is (= "((;ERROR: set!: missing or extra expression (set! x)) (x 0))" (str (evaluar-set! '(set! x) '(x 0)))))
     (is (= "((;ERROR: set!: missing or extra expression (set! x 1 2)) (x 0))" (str (evaluar-set! '(set! x 1 2) '(x 0)))))
     (is (= "((;ERROR: set!: bad variable 1) (x 0))" (str (evaluar-set! '(set! 1 2) '(x 0)))))))
+
+(deftest fnc-multiplicar-test
+  (testing "Funcion fnc-multiplicar"
+    (is (= 1 (fnc-multiplicar ())))
+    (is (= 3 (fnc-multiplicar '(3))))
+    (is (= 12 (fnc-multiplicar '(3 4))))
+    (is (= 60 (fnc-multiplicar '(3 4 5))))
+    (is (= 360 (fnc-multiplicar '(3 4 5 6))))
+    (is (= "(;ERROR: *: Wrong type in arg1 A)" (str (fnc-multiplicar '(A 4 5 6)))))
+    (is (= "(;ERROR: *: Wrong type in arg2 A)" (str (fnc-multiplicar '(3 A 5 6)))))
+    (is (= "(;ERROR: *: Wrong type in arg2 A)" (str (fnc-multiplicar '(3 4 A 6)))))))
