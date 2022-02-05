@@ -57,6 +57,7 @@
 (declare fnc-multiplicar)
 (declare fnc-dividir)
 (declare fnc-igual)
+(declare fnc-menor-o-igual)
 
 ; Funciones auxiliares
 
@@ -201,6 +202,7 @@
     (= fnc '<)            (fnc-menor lae)
     (= fnc '>)            (fnc-mayor lae)
     (= fnc '>=)           (fnc-mayor-o-igual lae)
+    (= fnc '<=)           (fnc-menor-o-igual lae)
     (= fnc '=)           (fnc-igual lae)
     (= fnc '+)           (fnc-sumar lae)
     (= fnc '-)           (fnc-restar lae)
@@ -1005,6 +1007,31 @@
   "Devuelve #t si los numeros de una lista son iguales; si no, #f."
   [elementos]
   (fnc-cmp-aux elementos = "="))  
+
+; user=> (fnc-menor-o-igual ())
+; #t
+; user=> (fnc-menor-o-igual '(1))
+; #t
+; user=> (fnc-menor-o-igual '(1 2))
+; #t
+; user=> (fnc-menor-o-igual '(1 2 3))
+; #t
+; user=> (fnc-menor-o-igual '(1 2 3 4))
+; #t
+; user=> (fnc-menor-o-igual '(1 2 2 4))
+; #t
+; user=> (fnc-menor-o-igual '(1 2 4 1))
+; #f
+; user=> (fnc-menor-o-igual '(A 1 2 3))
+; (;ERROR: <=: Wrong type in arg1 A)
+; user=> (fnc-menor-o-igual '(1 A 2 3))
+; (;ERROR: <=: Wrong type in arg2 A)
+; user=> (fnc-menor-o-igual '(1 2 A 3))
+; (;ERROR: <=: Wrong type in arg2 A)
+(defn fnc-menor-o-igual
+  "Devuelve #t si los numeros de una lista estan en orden creciente; si no, #f."
+  [elementos]
+  (fnc-cmp-aux elementos <= "<="))
 
 ; user=> (evaluar-escalar 32 '(x 6 y 11 z "hola"))
 ; (32 (x 6 y 11 z "hola"))

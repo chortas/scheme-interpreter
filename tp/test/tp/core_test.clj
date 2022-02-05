@@ -225,3 +225,16 @@
    (is (= "(;ERROR: =: Wrong type in arg1 A)" (str (fnc-igual '(A 2 2 2)))))
    (is (= "(;ERROR: =: Wrong type in arg2 A)" (str (fnc-igual '(2 A 2 2)))))
    (is (= "(;ERROR: =: Wrong type in arg2 A)" (str (fnc-igual '(2 2 A 2)))))))
+
+(deftest fnc-menor-o-igual-test
+ (testing "Funcion fnc-menor-o-igual"
+   (is (= (symbol "#t") (fnc-menor-o-igual ())))
+   (is (= (symbol "#t") (fnc-menor-o-igual '(1))))
+   (is (= (symbol "#t") (fnc-menor-o-igual '(1 2))))
+   (is (= (symbol "#t") (fnc-menor-o-igual '(1 2 3))))
+   (is (= (symbol "#t") (fnc-menor-o-igual '(1 3 3 4))))
+   (is (= (symbol "#t") (fnc-menor-o-igual '(1 2 2 4))))
+   (is (= (symbol "#f") (fnc-menor-o-igual '(1 2 4 1))))
+   (is (= "(;ERROR: <=: Wrong type in arg1 A)" (str (fnc-menor-o-igual '(A 1 2 3)))))
+   (is (= "(;ERROR: <=: Wrong type in arg2 A)" (str (fnc-menor-o-igual '(1 A 2 3)))))
+   (is (= "(;ERROR: <=: Wrong type in arg2 A)" (str (fnc-menor-o-igual '(1 2 A 3)))))))
