@@ -42,7 +42,6 @@
 (declare fnc-read)
 (declare fnc-mayor)
 (declare fnc-menor)
-(declare fnc-multiplicar)
 (declare fnc-null?)
 (declare fnc-sumar)
 (declare fnc-append)
@@ -53,6 +52,10 @@
 (declare fnc-newline)
 (declare fnc-reverse)
 (declare fnc-mayor-o-igual)
+
+; Nuevas funciones primitivas
+(declare fnc-multiplicar)
+(declare fnc-dividir)
 
 ; Funciones auxiliares
 
@@ -100,7 +103,7 @@
                'if 'if 'lambda 'lambda 'length 'length 'list 'list 'list? 'list? 'load 'load
                'newline 'newline 'nil (symbol "#f") 'not 'not 'null? 'null? 'or 'or 'quote 'quote
                'read 'read 'reverse 'reverse 'set! 'set! (symbol "#f") (symbol "#f")
-               (symbol "#t") (symbol "#t") '+ '+ '- '- '< '< '> '> '>= '>= '* '*)))
+               (symbol "#t") (symbol "#t") '+ '+ '- '- '< '< '> '> '>= '>= '* '* '/ '/)))
   ([amb]
    (print "> ") (flush)
    (try
@@ -201,6 +204,7 @@
     (= fnc '+)           (fnc-sumar lae)
     (= fnc '-)           (fnc-restar lae)
     (= fnc '*)           (fnc-multiplicar lae)
+    (= fnc '/)           (fnc-dividir lae)
     ;
     ;
     ; Si la funcion primitiva esta identificada por un simbolo, puede determinarse mas rapido que hacer con ella
@@ -512,6 +516,7 @@
            :wrong-number-args-oper (list (symbol (str fnc ":")) 'Wrong 'number 'of 'args 'given)
            :wrong-number-args-prim-proc (list 'Wrong 'number 'of 'args 'given (symbol "#<primitive-procedure") (symbol (str fnc '>)))
            :wrong-type-apply (list 'Wrong 'type 'to 'apply fnc)
+           :zero-division (list (symbol (str fnc ":")) 'Zero 'Division)
            ())))
   ([cod fnc nom-arg]
    (cons (symbol ";ERROR:") (cons (symbol (str fnc ":"))
@@ -832,7 +837,7 @@
 ; 60
 ; user=> (fnc-multiplicar '(3 4 5 6))
 ; 360
-; user=> (fnc-multiplicar '(r))
+; user=> (fnc-multiplicar '(A 4 5 6))
 ; (;ERROR: *: Wrong type in arg1 A)
 ; user=> (fnc-multiplicar '(3 A 5 6))
 ; (;ERROR: *: Wrong type in arg2 A)
@@ -851,6 +856,47 @@
   "Multiplica los elementos de una lista."
   [elementos]
   (nth (reduce fnc-multiplicar-aux [1 0] elementos) 0))
+
+; user=> (fnc-dividir ())
+; (;ERROR: /: Wrong number of args given)
+; user=> (fnc-dividir '(3))
+; 1/3
+; user=> (fnc-dividir '(0))
+; (;ERROR: /: Zero division)
+; user=> (fnc-dividir '(3 4))
+; 3/4
+; user=> (fnc-dividir '(3 4 5))
+; 3/20
+; user=> (fnc-dividir '(3 4 5 6))
+; 1/40
+; user=> (fnc-dividir '(3 0))
+; (;ERROR: /: Zero division)
+; user=> (fnc-dividir '(3 0 3))
+; (;ERROR: /: Zero division)
+; user=> (fnc-dividir '(A 4 5 6))
+; (;ERROR: /: Wrong type in arg1 A)
+; user=> (fnc-dividir '(3 A 5 6))
+; (;ERROR: /: Wrong type in arg2 A)
+; user=> (fnc-dividir '(3 4 A 6))
+; (;ERROR: /: Wrong type in arg2 A)
+(defn fnc-dividir-aux
+  "Divide los elementos de una lista."
+  [[acumulador i] elemento]
+  (cond
+    (or (= 0 acumulador) (= 0 elemento)) (reduced [(generar-mensaje-error :zero-division "/") i])
+    (not (number? acumulador)) (reduced [(generar-mensaje-error :wrong-type-arg1 "/" acumulador) i])
+    (not (number? elemento)) (reduced [(generar-mensaje-error :wrong-type-arg2 "/" elemento) i])
+    :else
+    [(/ acumulador elemento) (+ i 1)]))
+
+(defn fnc-dividir
+  "Divide los elementos de una lista."
+  [elementos]
+  (cond (= 0 (count elementos)) (generar-mensaje-error :wrong-number-args-oper "/")
+        (and (= 1 (count elementos)) (zero? (first elementos))) (generar-mensaje-error :zero-division "/")
+        (and (= 1 (count elementos)) (number? (first elementos))) (/ 1 (first elementos))
+        :else
+        (nth (reduce fnc-dividir-aux [(first elementos) 0] (rest elementos)) 0)))
 
 (defn fnc-cmp-aux
   "Funcion generica de comparacion de elementos de una lista"
