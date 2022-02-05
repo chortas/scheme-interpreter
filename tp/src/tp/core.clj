@@ -42,6 +42,7 @@
 (declare fnc-read)
 (declare fnc-mayor)
 (declare fnc-menor)
+(declare fnc-multiplicar)
 (declare fnc-null?)
 (declare fnc-sumar)
 (declare fnc-append)
@@ -199,6 +200,7 @@
     (= fnc '==)           (fnc-equal? lae)
     (= fnc '+)           (fnc-sumar lae)
     (= fnc '-)           (fnc-restar lae)
+    (= fnc '*)           (fnc-multiplicar lae)
     ;
     ;
     ; Si la funcion primitiva esta identificada por un simbolo, puede determinarse mas rapido que hacer con ella
@@ -819,6 +821,36 @@
         (= 1 (count elementos)) (- (first elementos))
         :else
         (nth (reduce fnc-restar-aux [(first elementos) 0] (rest elementos)) 0)))
+
+; user=> (fnc-multiplicar ())
+; 1
+; user=> (fnc-multiplicar '(3))
+; 3
+; user=> (fnc-multiplicar '(3 4))
+; 12
+; user=> (fnc-multiplicar '(3 4 5))
+; 60
+; user=> (fnc-multiplicar '(3 4 5 6))
+; 360
+; user=> (fnc-multiplicar '(A 4 5 6))
+; (;ERROR: *: Wrong type in arg1 A)
+; user=> (fnc-multiplicar '(3 A 5 6))
+; (;ERROR: *: Wrong type in arg2 A)
+; user=> (fnc-multiplicar '(3 4 A 6))
+; (;ERROR: *: Wrong type in arg2 A)
+(defn fnc-multiplicar-aux
+  "Multiplica los elementos de una lista."
+  [[acumulador i] elemento]
+  (cond
+    (and (not (number? elemento)) (= 0 i)) (reduced [(generar-mensaje-error :wrong-type-arg1 "+" elemento) i])
+    (not (number? elemento)) (reduced [(generar-mensaje-error :wrong-type-arg2 "+" elemento) i])
+    :else
+    [(* acumulador elemento) (+ i 1)]))
+
+(defn fnc-multiplicar
+  "Multiplica los elementos de una lista."
+  [elementos]
+  (nth (reduce fnc-multiplicar-aux [1 0] elementos) 0))
 
 (defn fnc-cmp-aux
   "Funcion generica de comparacion de elementos de una lista"
