@@ -56,6 +56,7 @@
 ; Nuevas funciones primitivas
 (declare fnc-multiplicar)
 (declare fnc-dividir)
+(declare fnc-igual)
 
 ; Funciones auxiliares
 
@@ -103,7 +104,7 @@
                'if 'if 'lambda 'lambda 'length 'length 'list 'list 'list? 'list? 'load 'load
                'newline 'newline 'nil (symbol "#f") 'not 'not 'null? 'null? 'or 'or 'quote 'quote
                'read 'read 'reverse 'reverse 'set! 'set! (symbol "#f") (symbol "#f")
-               (symbol "#t") (symbol "#t") '+ '+ '- '- '< '< '> '> '>= '>= '* '* '/ '/)))
+               (symbol "#t") (symbol "#t") '+ '+ '- '- '< '< '> '> '>= '>= '* '* '/ '/ '= '=)))
   ([amb]
    (print "> ") (flush)
    (try
@@ -200,7 +201,7 @@
     (= fnc '<)            (fnc-menor lae)
     (= fnc '>)            (fnc-mayor lae)
     (= fnc '>=)           (fnc-mayor-o-igual lae)
-    (= fnc '==)           (fnc-equal? lae)
+    (= fnc '=)           (fnc-igual lae)
     (= fnc '+)           (fnc-sumar lae)
     (= fnc '-)           (fnc-restar lae)
     (= fnc '*)           (fnc-multiplicar lae)
@@ -861,24 +862,24 @@
 ; (;ERROR: /: Wrong number of args given)
 ; user=> (fnc-dividir '(3))
 ; 1/3
-; user=> (fnc-dividir '(0))
-; (;ERROR: /: Zero division)
 ; user=> (fnc-dividir '(3 4))
 ; 3/4
 ; user=> (fnc-dividir '(3 4 5))
 ; 3/20
 ; user=> (fnc-dividir '(3 4 5 6))
 ; 1/40
-; user=> (fnc-dividir '(3 0))
-; (;ERROR: /: Zero division)
-; user=> (fnc-dividir '(3 0 3))
-; (;ERROR: /: Zero division)
 ; user=> (fnc-dividir '(A 4 5 6))
 ; (;ERROR: /: Wrong type in arg1 A)
 ; user=> (fnc-dividir '(3 A 5 6))
 ; (;ERROR: /: Wrong type in arg2 A)
 ; user=> (fnc-dividir '(3 4 A 6))
 ; (;ERROR: /: Wrong type in arg2 A)
+; user=> (fnc-dividir '(0))
+; (;ERROR: /: Zero division)
+; user=> (fnc-dividir '(3 0))
+; (;ERROR: /: Zero division)
+; user=> (fnc-dividir '(3 0 3))
+; (;ERROR: /: Zero division)
 (defn fnc-dividir-aux
   "Divide los elementos de una lista."
   [[acumulador i] elemento]
@@ -985,6 +986,25 @@
   "Devuelve #t si los numeros de una lista estan en orden decreciente; si no, #f."
   [elementos]
   (fnc-cmp-aux elementos >= ">="))
+
+; user=> (fnc-igual ())
+; #t
+; user=> (fnc-igual '(1))
+; #t
+; user=> (fnc-igual '(2 2))
+; #t
+; user=> (fnc-igual '(3 2))
+; #f
+; user=> (fnc-igual '(A 2 2 2))
+; (;ERROR: =: Wrong type in arg1 A)
+; user=> (fnc-igual '(2 A 2 2))
+; (;ERROR: =: Wrong type in arg2 A)
+; user=> (fnc-igual '(2 2 A 2))
+; (;ERROR: =: Wrong type in arg2 A)
+(defn fnc-igual
+  "Devuelve #t si los numeros de una lista son iguales; si no, #f."
+  [elementos]
+  (fnc-cmp-aux elementos = "="))  
 
 ; user=> (evaluar-escalar 32 '(x 6 y 11 z "hola"))
 ; (32 (x 6 y 11 z "hola"))

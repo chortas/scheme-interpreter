@@ -216,3 +216,12 @@
     (is (= "(;ERROR: /: Zero Division)" (str (fnc-dividir '(3 0)))))
     (is (= "(;ERROR: /: Zero Division)" (str (fnc-dividir '(3 0 3)))))))
 
+(deftest fnc-igual-test
+ (testing "Funcion fnc-igual"
+   (is (= (symbol "#t") (fnc-igual ())))
+   (is (= (symbol "#t") (fnc-igual '(1))))
+   (is (= (symbol "#t") (fnc-igual '(2 2))))
+   (is (= (symbol "#f") (fnc-igual '(3 2))))
+   (is (= "(;ERROR: =: Wrong type in arg1 A)" (str (fnc-igual '(A 2 2 2)))))
+   (is (= "(;ERROR: =: Wrong type in arg2 A)" (str (fnc-igual '(2 A 2 2)))))
+   (is (= "(;ERROR: =: Wrong type in arg2 A)" (str (fnc-igual '(2 2 A 2)))))))
