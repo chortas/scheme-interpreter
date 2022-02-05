@@ -26,6 +26,7 @@
 (declare evaluar-define)
 (declare evaluar-lambda)
 (declare evaluar-escalar)
+(declare evaluar-and)
 
 ; Funciones secundarias de aplicar
 (declare aplicar-lambda)
@@ -143,6 +144,7 @@
       (igual? (first expre) 'load) (evaluar-load expre amb)
       (igual? (first expre) 'quote) (evaluar-quote expre amb)
       (igual? (first expre) 'lambda) (evaluar-lambda expre amb)
+      (igual? (first expre) 'and) (evaluar-and expre amb)
          ;
          ;
          ;
@@ -1175,6 +1177,29 @@
                     (let [elemento-evaluado (first (evaluar elemento ambiente))]
                       (cond (not (= elemento-falso elemento-evaluado)) (reduced elemento-evaluado)
                             :else acum))) elemento-falso elementos) ambiente)))
+
+; user=> (evaluar-and (list 'and) (list (symbol "#f") (symbol "#f") (symbol "#t") (symbol "#t")))
+; (#t (#f #f #t #t))
+; user=> (evaluar-and (list 'and (symbol "#t")) (list (symbol "#f") (symbol "#f") (symbol "#t") (symbol "#t")))
+; (#t (#f #f #t #t))
+; user=> (evaluar-and (list 'and 7) (list (symbol "#f") (symbol "#f") (symbol "#t") (symbol "#t")))
+; (7 (#f #f #t #t))
+; user=> (evaluar-and (list 'and (symbol "#f") 5) (list (symbol "#f") (symbol "#f") (symbol "#t") (symbol "#t")))
+; (#f (#f #f #t #t))
+; user=> (evaluar-and (list 'and (symbol "#f")) (list (symbol "#f") (symbol "#f") (symbol "#t") (symbol "#t")))
+; (#f (#f #f #t #t))
+; user=> (evaluar-and (list 'and (symbol "#t") 7) (list (symbol "#f") (symbol "#f") (symbol "#t") (symbol "#t")))
+; (7 (#f #f #t #t))
+; user=> (evaluar-and (list 'and (symbol "#t") 7 (symbol "#t")) (list (symbol "#f") (symbol "#f") (symbol "#t") (symbol "#t")))
+; (#t (#f #f #t #t))
+(defn evaluar-and
+  "Evalua una expresion `and`.  Devuelve una lista con el resultado y un ambiente."
+  [expresion ambiente]
+  (let [elemento-falso (symbol "#f") elemento-verdadero (symbol "#t") elementos (cons elemento-verdadero (rest expresion))]
+    (list (reduce (fn [acum elemento]
+                    (let [elemento-evaluado (first (evaluar elemento ambiente))]
+                      (cond (= elemento-falso elemento-evaluado) (reduced elemento-falso)
+                            :else elemento-evaluado))) elemento-verdadero elementos) ambiente)))
 
 ; user=> (evaluar-set! '(set! x 1) '(x 0))
 ; (#<unspecified> (x 1))
