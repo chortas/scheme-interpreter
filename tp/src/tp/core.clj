@@ -27,6 +27,8 @@
 (declare evaluar-lambda)
 (declare evaluar-escalar)
 (declare evaluar-and)
+(declare evaluar-let)
+(declare evaluar-begin)
 
 ; Funciones secundarias de aplicar
 (declare aplicar-lambda)
@@ -107,7 +109,7 @@
                'if 'if 'lambda 'lambda 'length 'length 'list 'list 'list? 'list? 'load 'load
                'newline 'newline 'nil (symbol "#f") 'not 'not 'null? 'null? 'or 'or 'quote 'quote
                'read 'read 'reverse 'reverse 'set! 'set! (symbol "#f") (symbol "#f")
-               (symbol "#t") (symbol "#t") '+ '+ '- '- '< '< '> '> '>= '>= '* '* '/ '/ '= '= 'eq? 'eq?)))
+               (symbol "#t") (symbol "#t") '+ '+ '- '- '< '< '> '> '>= '>= '* '* '/ '/ '= '= 'eq? 'eq? 'let 'let 'begin 'begin)))
   ([amb]
    (print "> ") (flush)
    (try
@@ -145,6 +147,9 @@
       (igual? (first expre) 'quote) (evaluar-quote expre amb)
       (igual? (first expre) 'lambda) (evaluar-lambda expre amb)
       (igual? (first expre) 'and) (evaluar-and expre amb)
+      (igual? (first expre) 'let) (evaluar-let expre amb)
+      (igual? (first expre) 'begin) (evaluar-begin expre amb)
+
          ;
          ;
          ;
@@ -219,7 +224,7 @@
     (igual? fnc 'append)  (fnc-append lae)
     (igual? fnc 'car) (fnc-car lae)
     (igual? fnc 'cdr) (fnc-cdr lae)
-    (igual? fnc 'env) (fnc-env lae)
+    (igual? fnc 'env) (fnc-env lae amb)
     (igual? fnc 'not) (fnc-not lae)
     (igual? fnc 'cons) (fnc-cons lae)
     (igual? fnc 'list) (fnc-list lae)
@@ -1126,6 +1131,30 @@
       (and (seq? (second expresion)) (not (empty? (second expresion)))) (cond (and (>= (count expresion) 3) (seq? (nth expresion 2))) (formatear-lambda expresion ambiente unspecified))
       :else
       (list (generar-mensaje-error :bad-variable (first expresion) expresion) ambiente))))
+
+
+(defn buscar-let-aux
+  [elemento ambiente]  
+  (let [resultado (buscar elemento ambiente)]
+    (cond (error? resultado) elemento
+      :else resultado)))
+
+; user => (evaluar-let '(let ((x 10) (y 20)) (+ x y)) '(x 1))
+; (30 (x 1))
+(defn evaluar-let
+  "Evalua una expresion `let`. Devuelve una lista con el resultado y el ambiente."
+  [expresion ambiente]
+  (let [ambiente-variables (flatten (second expresion))]
+    (evaluar 
+        (map (fn [elemento] (buscar-let-aux elemento ambiente-variables)) (last expresion))
+        ambiente)))
+
+; user => (evaluar-begin '(begin (set! x 5) (+ x 1)) '(y 1))
+; (6 (y 1))
+(defn evaluar-begin
+  [expresion ambiente]
+  (reduce (fn [acum elemento]
+    (evaluar elemento (second acum))) (list (list) ambiente) (rest expresion)))
 
 ; user=> (evaluar-if '(if 1 2) '(n 7))
 ; (2 (n 7))
