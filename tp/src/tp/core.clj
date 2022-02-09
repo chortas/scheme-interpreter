@@ -1195,7 +1195,7 @@
 ; user=> (fnc-eq? '(a a a))
 ; #t
 ; user=> (fnc-eq? '(a a b))
-; #t
+; #f
 (defn fnc-eq?
   "Compara elementos. Si son iguales, devuelve #t. Si no, #f."
   [elementos]
