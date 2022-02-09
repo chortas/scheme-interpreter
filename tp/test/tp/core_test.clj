@@ -190,3 +190,86 @@
     (is (= "((;ERROR: set!: missing or extra expression (set! x)) (x 0))" (str (evaluar-set! '(set! x) '(x 0)))))
     (is (= "((;ERROR: set!: missing or extra expression (set! x 1 2)) (x 0))" (str (evaluar-set! '(set! x 1 2) '(x 0)))))
     (is (= "((;ERROR: set!: bad variable 1) (x 0))" (str (evaluar-set! '(set! 1 2) '(x 0)))))))
+
+; FINAL
+
+(deftest fnc-multiplicar-test
+  (testing "Funcion fnc-multiplicar"
+    (is (= 1 (fnc-multiplicar ())))
+    (is (= 3 (fnc-multiplicar '(3))))
+    (is (= 12 (fnc-multiplicar '(3 4))))
+    (is (= 60 (fnc-multiplicar '(3 4 5))))
+    (is (= 360 (fnc-multiplicar '(3 4 5 6))))
+    (is (= "(;ERROR: *: Wrong type in arg1 A)" (str (fnc-multiplicar '(A 4 5 6)))))
+    (is (= "(;ERROR: *: Wrong type in arg2 A)" (str (fnc-multiplicar '(3 A 5 6)))))
+    (is (= "(;ERROR: *: Wrong type in arg2 A)" (str (fnc-multiplicar '(3 4 A 6)))))))
+
+(deftest fnc-dividir-test
+  (testing "Funcion fnc-dividir"
+    (is (= "(;ERROR: /: Wrong number of args given)" (str (fnc-dividir ()))))
+    (is (= 1/3 (fnc-dividir '(3))))
+    (is (= 3/4 (fnc-dividir '(3 4))))
+    (is (= 3/20 (fnc-dividir '(3 4 5))))
+    (is (= 1/40 (fnc-dividir '(3 4 5 6))))
+    (is (= 0 (fnc-dividir '(0 4 5 6))))
+    (is (= "(;ERROR: /: Wrong type in arg1 A)" (str (fnc-dividir '(A 4 5 6)))))
+    (is (= "(;ERROR: /: Wrong type in arg2 A)" (str (fnc-dividir '(3 A 5 6)))))
+    (is (= "(;ERROR: /: Wrong type in arg2 A)" (str (fnc-dividir '(3 4 A 6)))))
+    (is (= "(;ERROR: /: Zero Division)" (str (fnc-dividir '(0)))))
+    (is (= "(;ERROR: /: Zero Division)" (str (fnc-dividir '(3 0)))))
+    (is (= "(;ERROR: /: Zero Division)" (str (fnc-dividir '(3 0 3)))))))
+
+(deftest fnc-igual-test
+ (testing "Funcion fnc-igual"
+   (is (= (symbol "#t") (fnc-igual ())))
+   (is (= (symbol "#t") (fnc-igual '(1))))
+   (is (= (symbol "#t") (fnc-igual '(2 2))))
+   (is (= (symbol "#f") (fnc-igual '(3 2))))
+   (is (= "(;ERROR: =: Wrong type in arg1 A)" (str (fnc-igual '(A 2 2 2)))))
+   (is (= "(;ERROR: =: Wrong type in arg2 A)" (str (fnc-igual '(2 A 2 2)))))
+   (is (= "(;ERROR: =: Wrong type in arg2 A)" (str (fnc-igual '(2 2 A 2)))))))
+
+(deftest fnc-menor-o-igual-test
+ (testing "Funcion fnc-menor-o-igual"
+   (is (= (symbol "#t") (fnc-menor-o-igual ())))
+   (is (= (symbol "#t") (fnc-menor-o-igual '(1))))
+   (is (= (symbol "#t") (fnc-menor-o-igual '(1 2))))
+   (is (= (symbol "#t") (fnc-menor-o-igual '(1 2 3))))
+   (is (= (symbol "#t") (fnc-menor-o-igual '(1 3 3 4))))
+   (is (= (symbol "#t") (fnc-menor-o-igual '(1 2 2 4))))
+   (is (= (symbol "#f") (fnc-menor-o-igual '(1 2 4 1))))
+   (is (= "(;ERROR: <=: Wrong type in arg1 A)" (str (fnc-menor-o-igual '(A 1 2 3)))))
+   (is (= "(;ERROR: <=: Wrong type in arg2 A)" (str (fnc-menor-o-igual '(1 A 2 3)))))
+   (is (= "(;ERROR: <=: Wrong type in arg2 A)" (str (fnc-menor-o-igual '(1 2 A 3)))))))
+
+(deftest fnc-eq-test
+ (testing "Funcion fnc-eq"
+   (is (= (symbol "#t") (fnc-eq? ())))
+   (is (= (symbol "#t") (fnc-eq? '(A))))
+   (is (= (symbol "#t") (fnc-eq? '(a a))))
+   (is (= (symbol "#f") (fnc-eq? '(hello goodbye))))
+   (is (= (symbol "#f") (fnc-eq? (list (list 1 2) (list 1 2)))))
+   (is (= (symbol "#t") (fnc-eq? (list (list) (list)))))
+   (is (= (symbol "#f") (fnc-eq? '(2.5 2.5))))
+   (is (= (symbol "#t") (fnc-eq? '(a a a))))
+   (is (= (symbol "#f") (fnc-eq? '(a a b))))))
+
+(deftest evaluar-and-test
+ (testing "Funcion evaluar-and"
+   (is (= (list (symbol "#t") (list (symbol "#f") (symbol "#f") (symbol "#t") (symbol "#t"))) (evaluar-and (list 'and) (list (symbol "#f") (symbol "#f") (symbol "#t") (symbol "#t")))))
+   (is (= (list (symbol "#t") (list (symbol "#f") (symbol "#f") (symbol "#t") (symbol "#t"))) (evaluar-and (list 'and (symbol "#t")) (list (symbol "#f") (symbol "#f") (symbol "#t") (symbol "#t")))))
+   (is (= (list 7 (list (symbol "#f") (symbol "#f") (symbol "#t") (symbol "#t"))) (evaluar-and (list 'and 7) (list (symbol "#f") (symbol "#f") (symbol "#t") (symbol "#t")))))
+   (is (= (list (symbol "#f") (list (symbol "#f") (symbol "#f") (symbol "#t") (symbol "#t"))) (evaluar-and (list 'and (symbol "#f") 5) (list (symbol "#f") (symbol "#f") (symbol "#t") (symbol "#t")))))
+   (is (= (list (symbol "#f") (list (symbol "#f") (symbol "#f") (symbol "#t") (symbol "#t"))) (evaluar-and (list 'and (symbol "#f")) (list (symbol "#f") (symbol "#f") (symbol "#t") (symbol "#t")))))
+   (is (= (list 7 (list (symbol "#f") (symbol "#f") (symbol "#t") (symbol "#t"))) (evaluar-and (list 'and (symbol "#t") 7) (list (symbol "#f") (symbol "#f") (symbol "#t") (symbol "#t")))))
+   (is (= (list (symbol "#t") (list (symbol "#f") (symbol "#f") (symbol "#t") (symbol "#t"))) (evaluar-and (list 'and (symbol "#t") 7 (symbol "#t")) (list (symbol "#f") (symbol "#f") (symbol "#t") (symbol "#t")))))))
+
+(deftest evaluar-let-test
+ (testing "Funcion evaluar-let"
+   (is (= (list 30 (list 'x 1 '+ '+)) (evaluar-let (list 'let (list (list 'x 10) (list 'y 20)) (list '+ 'x 'y)) (list 'x 1 '+ '+))))
+   (is (= (list 12 (list 'x 1 '+ '+)) (evaluar-let (list 'let (list (list 'x 10)) (list '+ 'x 2)) (list 'x 1 '+ '+))))
+   (is (= (list 200 (list 'x 1 '* '*)) (evaluar-let (list 'let (list (list 'x 10) (list 'y 20)) (list '* 'x 'y)) (list 'x 1 '* '*))))))
+
+(deftest evaluar-begin-test
+ (testing "Funcion evaluar-begin"
+   (is (= (list 6 (list 'x 5 '+ '+ 'set! 'set!)) (evaluar-begin (list 'begin (list 'set! 'x 5) (list '+ 'x 1)) (list 'x 0 '+ '+ 'set! 'set!))))))
