@@ -1110,18 +1110,18 @@
 ; user=> (fnc-dividir '(3 4 A 6))
 ; (;ERROR: /: Wrong type in arg2 A)
 ; user=> (fnc-dividir '(0))
-; (;ERROR: /: Zero division)
+; (;ERROR: /: Zero Division)
 ; user=> (fnc-dividir '(3 0))
-; (;ERROR: /: Zero division)
+; (;ERROR: /: Zero Division)
 ; user=> (fnc-dividir '(3 0 3))
-; (;ERROR: /: Zero division)
+; (;ERROR: /: Zero Division)
 (defn fnc-dividir-aux
   "Divide los elementos de una lista."
   [[acumulador i] elemento]
   (cond
-    (or (= 0 acumulador) (= 0 elemento)) (reduced [(generar-mensaje-error :zero-division "/") i])
     (not (number? acumulador)) (reduced [(generar-mensaje-error :wrong-type-arg1 "/" acumulador) i])
     (not (number? elemento)) (reduced [(generar-mensaje-error :wrong-type-arg2 "/" elemento) i])
+    (zero? elemento) (reduced [(generar-mensaje-error :zero-division "/") i])
     :else
     [(/ acumulador elemento) (+ i 1)]))
 

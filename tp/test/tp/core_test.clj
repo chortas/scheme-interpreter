@@ -211,6 +211,7 @@
     (is (= 3/4 (fnc-dividir '(3 4))))
     (is (= 3/20 (fnc-dividir '(3 4 5))))
     (is (= 1/40 (fnc-dividir '(3 4 5 6))))
+    (is (= 0 (fnc-dividir '(0 4 5 6))))
     (is (= "(;ERROR: /: Wrong type in arg1 A)" (str (fnc-dividir '(A 4 5 6)))))
     (is (= "(;ERROR: /: Wrong type in arg2 A)" (str (fnc-dividir '(3 A 5 6)))))
     (is (= "(;ERROR: /: Wrong type in arg2 A)" (str (fnc-dividir '(3 4 A 6)))))
