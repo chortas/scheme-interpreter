@@ -191,6 +191,8 @@
     (is (= "((;ERROR: set!: missing or extra expression (set! x 1 2)) (x 0))" (str (evaluar-set! '(set! x 1 2) '(x 0)))))
     (is (= "((;ERROR: set!: bad variable 1) (x 0))" (str (evaluar-set! '(set! 1 2) '(x 0)))))))
 
+; FINAL
+
 (deftest fnc-multiplicar-test
   (testing "Funcion fnc-multiplicar"
     (is (= 1 (fnc-multiplicar ())))
@@ -260,3 +262,13 @@
    (is (= (list (symbol "#f") (list (symbol "#f") (symbol "#f") (symbol "#t") (symbol "#t"))) (evaluar-and (list 'and (symbol "#f")) (list (symbol "#f") (symbol "#f") (symbol "#t") (symbol "#t")))))
    (is (= (list 7 (list (symbol "#f") (symbol "#f") (symbol "#t") (symbol "#t"))) (evaluar-and (list 'and (symbol "#t") 7) (list (symbol "#f") (symbol "#f") (symbol "#t") (symbol "#t")))))
    (is (= (list (symbol "#t") (list (symbol "#f") (symbol "#f") (symbol "#t") (symbol "#t"))) (evaluar-and (list 'and (symbol "#t") 7 (symbol "#t")) (list (symbol "#f") (symbol "#f") (symbol "#t") (symbol "#t")))))))
+
+(deftest evaluar-let-test
+ (testing "Funcion evaluar-let"
+   (is (= (list 30 (list 'x 1 '+ '+)) (evaluar-let (list 'let (list (list 'x 10) (list 'y 20)) (list '+ 'x 'y)) (list 'x 1 '+ '+))))
+   (is (= (list 12 (list 'x 1 '+ '+)) (evaluar-let (list 'let (list (list 'x 10)) (list '+ 'x 2)) (list 'x 1 '+ '+))))
+   (is (= (list 200 (list 'x 1 '* '*)) (evaluar-let (list 'let (list (list 'x 10) (list 'y 20)) (list '* 'x 'y)) (list 'x 1 '* '*))))))
+
+(deftest evaluar-begin-test
+ (testing "Funcion evaluar-begin"
+   (is (= (list 6 (list 'x 5 '+ '+ 'set! 'set!)) (evaluar-begin (list 'begin (list 'set! 'x 5) (list '+ 'x 1)) (list 'x 0 '+ '+ 'set! 'set!))))))
